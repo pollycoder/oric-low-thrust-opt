@@ -2,10 +2,8 @@
 %% Cubic-fit interpolation
 % Interpolate the states and controlled variable
 % Input: 
-%   s0: Initial state - theta0, d(theta)/dt(0), 
-%                       phi0, d(phi)/dt(0)
-%   sf: Final state - thetaf, d(theta)/dt(f), 
-%                     phif, d(phi)/dt(f)
+%   s0: Initial state - theta0, phi0, d(theta)/dt(0), d(phi)/dt(0)
+%   sf: Final state - thetaf, phif, d(theta)/dt(f), d(phi)/dt(f)
 %   t0: Initial time
 %   tf: Final time
 %   M1,M2: C-W matrix
@@ -24,14 +22,14 @@ F = [1, t0, t0^2, t0^3;
 
 % Initial state
 theta0 = SphericalState4D0(1);
-vTheta0 = SphericalState4D0(2);
-phi0 = SphericalState4D0(3);
+phi0 = SphericalState4D0(2);
+vTheta0 = SphericalState4D0(3);
 vPhi0 = SphericalState4D0(4);
 
 % Final state
 thetaf = SphericalState4Df(1);
-vThetaf = SphericalState4Df(2);
-phif = SphericalState4Df(3);
+phif = SphericalState4Df(2);
+vThetaf = SphericalState4Df(3);
 vPhif = SphericalState4Df(4);
 
 % Interpolation coefficient
@@ -45,33 +43,31 @@ syms t
 
 % Interpolate the state and acceleration
 % State
-SphericalState4D = zeros(4,1);
 SphericalState4D(1) = c(4) * t^3 + c(3) * t^2 + c(2) * t + c(1);
-SphericalState4D(3) = d(4) * t^3 + d(3) * t^2 + d(2) * t + d(1);
-SphericalState4D(2) = 3 * c(4) * t^2 + 2 * c(3) * t + c(2);
+SphericalState4D(2) = d(4) * t^3 + d(3) * t^2 + d(2) * t + d(1);
+SphericalState4D(3) = 3 * c(4) * t^2 + 2 * c(3) * t + c(2);
 SphericalState4D(4) = 3 * d(4) * t^2 + 2 * d(3) * t + d(2);
 
 % Acceleration
-SphericalAcc = zeros(2, 1);
 SphericalAcc(1) = 6 * c(4) * t + 2 * c(3);
 SphericalAcc(2) = 6 * d(4) * t + 2 * d(3);
 
 % Variable transform to make the code cleaner
-vTheta = SphericalState4D(2);
+vTheta = SphericalState4D(3);
 vPhi = SphericalState4D(4);
 aTheta = SphericalAcc(1);
 aPhi = SphericalAcc(2);
 sTheta = sin(SphericalState4D(1));
 cTheta = cos(SphericalState4D(1));
-sPhi = sin(SphericalState4D(3));
-cPhi = cos(SphericalState4D(3));
+sPhi = sin(SphericalState4D(2));
+cPhi = cos(SphericalState4D(2));
 
 % Cartesian position and velocity
-p = rho * [cTheta * sTheta, sTheta * sPhi, cPhi]';                          % Position
-v = rho * [-vTheta * sTheta * sPhi + vPhi * cTheta * cPhi, ...              % Velocity
+p = rho .* [cTheta * sTheta, sTheta * sPhi, cPhi]';                          % Position
+v = rho .* [-vTheta * sTheta * sPhi + vPhi * cTheta * cPhi, ...              % Velocity
             vTheta * cTheta * cPhi + vPhi * sTheta * cPhi, ...  
             -vPhi * sPhi]';
-a = rho * [-aTheta * sTheta * sPhi - vTheta^2 * cTheta * sPhi ...           % Acceleration
+a = rho .* [-aTheta * sTheta * sPhi - vTheta^2 * cTheta * sPhi ...           % Acceleration
            - 2 * vTheta * vPhi * sTheta * cPhi + aPhi * cTheta * cPhi ...
            - vTheta^2 * cTheta * sPhi, ...
             aTheta * cTheta * sPhi - vTheta^2 * sTheta * sPhi ...
@@ -83,7 +79,8 @@ a = rho * [-aTheta * sTheta * sPhi - vTheta^2 * cTheta * sPhi ...           % Ac
 u = a - M1 * p - M2 * v;
 
 % The optimal index
-E = 0.5 * (u' * u);
-Energy = @(x)subs(E, t, x);
-J = integral(Energy, t0, tf);
+E = 0.5 * (sum(u.^2));
+energy = @(x)subs(E, t, x);
+J = double(gaussLegendre5_comp(energy, t0, tf, 10));
 end
+
