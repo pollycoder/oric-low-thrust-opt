@@ -46,7 +46,7 @@ X2 = X * r;
 Y2 = Y * r;
 Z2 = Z * r;
 surf(X2, Y2, Z2,  'FaceAlpha', 0.5, 'EdgeColor', 'texturemap'); hold on
-colormap(gca, 'default')
+colormap(gca, 'copper')
 axis equal
 
 plot3(0, 0, 0, '*k', 'LineWidth', 2);hold on
