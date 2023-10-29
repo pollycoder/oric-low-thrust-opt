@@ -40,7 +40,7 @@ xlabel('x');
 ylabel('y');
 zlabel('z');
 
-r = 5;
+r = 8;
 [X, Y, Z] = sphere;
 X2 = X * r;
 Y2 = Y * r;
@@ -49,10 +49,11 @@ surf(X2, Y2, Z2,  'FaceAlpha', 0.5, 'EdgeColor', 'texturemap'); hold on
 colormap(gca, 'default')
 axis equal
 
-plot3(0, 0, 0, '*k', 'LineWidth', 2);
+plot3(0, 0, 0, '*k', 'LineWidth', 2);hold on
 plot3(x(1), y(1), z(1), '*g', 'LineWidth', 2); hold on
-plot3(x(end), y(end), z(end), '*r', 'LineWidth', 2);
-
+text(x(1), y(1), z(1), 'Departure');hold on
+plot3(x(end), y(end), z(end), '*r', 'LineWidth', 2);hold on
+text(x(end), y(end), z(end), 'Arrival');
 
 
 
