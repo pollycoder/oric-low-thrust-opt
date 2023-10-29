@@ -35,7 +35,7 @@ s6D(:, [2, 3, 5, 6]) = s4D;
 [x, y, z] = sph2cart(s6D(:, 2), pi / 2 * ones(n, 1) - s6D(:, 3), s6D(:, 1));
 
 
-plot3(x, y, z, 'LineWidth', 1.5, 'Color', 'r'); hold on
+plot3(x, y, z, 'LineWidth', 2, 'Color', 'b'); hold on
 xlabel('x');
 ylabel('y');
 zlabel('z');
@@ -53,7 +53,18 @@ plot3(0, 0, 0, '*k', 'LineWidth', 2);hold on
 plot3(x(1), y(1), z(1), '*g', 'LineWidth', 2); hold on
 text(x(1), y(1), z(1), 'Departure');hold on
 plot3(x(end), y(end), z(end), '*r', 'LineWidth', 2);hold on
-text(x(end), y(end), z(end), 'Arrival');
+text(x(end), y(end), z(end), 'Arrival');hold on
+
+index = linspace(1, length(x), 112);
+x1 = x(index);
+y1 = y(index);
+z1 = z(index);
+u1x = u(1, index)';
+u1y = u(2, index)';
+u1z = u(3, index)';
+quiver3(x1, y1, z1, u1x, u1y, u1z, 0.3, 'Color', 'r','LineWidth', 1);
+
+
 
 
 
