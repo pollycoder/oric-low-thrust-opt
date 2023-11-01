@@ -15,7 +15,11 @@
 %   SphericalState(5): vTheta
 %   SphericalState(6): vPhi
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [SphericalState6D] = Cartesian2Spherical(CartesianState)
+function [SphericalState6D] = Cartesian2Spherical(CartesianState, tol)
+if nargin < 2
+    tol = 1e-6;
+end
+
 SphericalState6D = zeros(6,1);
 
 x1 = CartesianState(1);
@@ -36,6 +40,10 @@ theta = mod(SphericalState6D(2), 2 * pi);
 % phi
 SphericalState6D(3) = acos(x3 / rho);
 phi = mod(SphericalState6D(3), 2 * pi);
+
+if abs(sin(phi)) < tol
+    error("The Phi you chose makes the problem singular.");
+end
 
 % Trigonometric function
 sTheta = sin(theta);

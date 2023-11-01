@@ -9,7 +9,6 @@ clear all
 % 46(4), 666-679.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 syms t
-vpa(pi, 3.14159265358979e+000);
 
 x0 = [-10, 0, 0, 0, 0, pi]';
 xf = [0, -10, 0, 0, 0, pi]';
@@ -27,15 +26,13 @@ sf4D = sf([2, 3, 5, 6]);
 %}
 
 omega = 4;
-%omega = 2*pi/24;
 M1 = diag([3 * omega^2, 0, -omega^2]);
 M2 = diag([2 * omega, 0], 1) + diag([-2 * omega, 0], -1);
-[T, u, s, J, rho] = cubicFitRot(x0, xf, t0, tf, M1, M2);
+[T, u, s, J, rho] = cubicFitRot(x0, xf, t0, tf, M1, M2, 150);
 %[J, u, s] = cubicFit(s04D, sf4D, t0, tf, M1, M2, rho);
 
 
 %
-TBack = blkdiag(inv(T), inv(T));
 
 
 u = double(subs(u, t, tValue));
@@ -48,6 +45,11 @@ s6D(:, 4) = zeros(1, n);
 s6D(:, [2, 3, 5, 6]) = s4D;
 
 [x, y, z] = sph2cart(s6D(:, 2), pi / 2 * ones(n, 1) - s6D(:, 3), s6D(:, 1));
+X = [x';y';z'];
+XBack = T \ X;
+x = XBack(1, :)';
+y = XBack(2, :)';
+z = XBack(3, :)';
 
 figure
 f = figure;
@@ -56,7 +58,7 @@ xlabel('x');
 ylabel('y');
 zlabel('z');
 
-r = 10;
+r = 5;
 [X, Y, Z] = sphere;
 X2 = X * r;
 Y2 = Y * r;

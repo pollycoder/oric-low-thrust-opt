@@ -35,12 +35,12 @@ cPhi = cos(phi);
 CartesianState = zeros(6, 1);
 
 % Cartesian position and velocity
-p = rho * [cTheta * sPhi;
-           sTheta * sPhi;
-           cPhi];                          % Position
-v = rho * [-vTheta * sTheta * sPhi + vPhi * cTheta * cPhi;               % Velocity
-            vTheta * cTheta * sPhi + vPhi * sTheta * cPhi;
-           -vPhi * sPhi];
+p = rho .* [cTheta .* sPhi;
+            sTheta .* sPhi;
+            cPhi];                          % Position
+v = rho .* [-vTheta .* sTheta .* sPhi + vPhi .* cTheta .* cPhi;             % Velocity
+            vTheta .* cTheta .* sPhi + vPhi .* sTheta .* cPhi;   
+            -vPhi .* sPhi];
 CartesianState(1:3) = p;
 CartesianState(4:6) = v;
 
