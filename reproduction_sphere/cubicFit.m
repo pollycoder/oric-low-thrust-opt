@@ -39,7 +39,7 @@ c = F \ bTheta;
 d = F \ bPhi;
 
 % Interpolation and get the optimizing index
-syms t
+syms t real
 
 % Interpolate the state and acceleration
 % State
@@ -47,6 +47,9 @@ SphericalState4D(1) = c(4) * t^3 + c(3) * t^2 + c(2) * t + c(1);
 SphericalState4D(2) = d(4) * t^3 + d(3) * t^2 + d(2) * t + d(1);
 SphericalState4D(3) = 3 * c(4) * t^2 + 2 * c(3) * t + c(2);
 SphericalState4D(4) = 3 * d(4) * t^2 + 2 * d(3) * t + d(2);
+
+
+
 
 % Acceleration
 SphericalAcc(1) = 6 * c(4) * t + 2 * c(3);
@@ -63,24 +66,28 @@ sPhi = sin(SphericalState4D(2));
 cPhi = cos(SphericalState4D(2));
 
 % Cartesian position and velocity
-p = rho .* [cTheta * sTheta, sTheta * sPhi, cPhi]';                          % Position
-v = rho .* [-vTheta * sTheta * sPhi + vPhi * cTheta * cPhi, ...              % Velocity
-            vTheta * cTheta * cPhi + vPhi * sTheta * cPhi, ...  
-            -vPhi * sPhi]';
-a = rho .* [-aTheta * sTheta * sPhi - vTheta^2 * cTheta * sPhi ...           % Acceleration
+p = rho .* [cTheta * sPhi;
+            sTheta * sPhi;
+            cPhi];                          % Position
+v = rho .* [-vTheta * sTheta * sPhi + vPhi * cTheta * cPhi;             % Velocity
+            vTheta * cTheta * sPhi + vPhi * sTheta * cPhi;   
+            -vPhi * sPhi];
+
+a = real(rho .* [-aTheta * sTheta * sPhi - vTheta^2 * cTheta * sPhi ...     % Acceleration
            - 2 * vTheta * vPhi * sTheta * cPhi + aPhi * cTheta * cPhi ...
-           - vTheta^2 * cTheta * sPhi, ...
+           - vTheta^2 * cTheta * sPhi,...
             aTheta * cTheta * sPhi - vTheta^2 * sTheta * sPhi ...
            + 2 * vTheta * vPhi * cTheta * cPhi + aPhi * sTheta * cPhi ...
            - vPhi^2 * sTheta * sPhi, ...
-           -aPhi * sPhi - vPhi^2 * cPhi]';
+           -aPhi * sPhi - vPhi^2 * cPhi]');
 
 % Controlled variable
 u = a - M1 * p - M2 * v;
 
 % The optimal index
-E = 0.5 * (sum(u.^2));
+E = 0.5 * (u' * u);
 energy = @(x)subs(E, t, x);
-J = double(gaussLegendre5_comp(energy, t0, tf, 10));
+J = double(gaussLegendre5_comp(energy, t0, tf, 50));
+%J = double(int(E, [t0, tf]));
 end
 

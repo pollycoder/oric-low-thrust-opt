@@ -11,24 +11,44 @@
 %   SphericalState(1): rho
 %   SphericalState(2): theta
 %   SphericalState(3): phi
-%   SphericalState(4): d(rho)/dt
-%   SphericalState(5): d(theta)/dt
-%   SphericalState(6): d(phi)/dt
+%   SphericalState(4): vRho
+%   SphericalState(5): vTheta
+%   SphericalState(6): vPhi
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function [SphericalState6D] = Cartesian2Spherical(CartesianState)
 SphericalState6D = zeros(6,1);
 
-SphericalState6D(1) = sqrt(CartesianState(1)^2 ...
-                        + CartesianState(2)^2 ...
-                        + CartesianState(3)^2);
-SphericalState6D(2) = atan2(CartesianState(2), CartesianState(1));
+x1 = CartesianState(1);
+x2 = CartesianState(2);
+x3 = CartesianState(3);
+x4 = CartesianState(4);
+x5 = CartesianState(5);
+x6 = CartesianState(6);
 
-SphericalState6D(3) = acos(CartesianState(3) / SphericalState6D(1));
+% rho
+SphericalState6D(1) = sqrt(x1^2 + x2^2 + x3^2);
+rho = SphericalState6D(1);
 
-SphericalState6D(5) = -sin(SphericalState6D(2)) / sin(SphericalState6D(3)) * CartesianState(4) ...
-                    + cos(SphericalState6D(2)) / sin(SphericalState6D(3)) * CartesianState(5);
+% theta
+SphericalState6D(2) = atan2(x2, x1);
+theta = mod(SphericalState6D(2), 2 * pi);
 
-SphericalState6D(6) = cos(SphericalState6D(2)) * cos(SphericalState6D(3)) * CartesianState(4) ...
-                    + sin(SphericalState6D(2)) * cos(SphericalState6D(3)) * CartesianState(5) ...
-                    - sin(CartesianState(3)) * CartesianState(6);
+% phi
+SphericalState6D(3) = acos(x3 / rho);
+phi = mod(SphericalState6D(3), 2 * pi);
+
+% Trigonometric function
+sTheta = sin(theta);
+cTheta = cos(theta);
+sPhi = sin(phi);
+cPhi = cos(phi);
+
+
+% vRho = 0
+% vTheta
+SphericalState6D(5) = -sTheta / sPhi * x4 + cTheta / sPhi * x5;
+
+% vPhi
+SphericalState6D(6) = cTheta * cPhi * x4 + sTheta * cPhi * x5 - sPhi * x6;
+
 end

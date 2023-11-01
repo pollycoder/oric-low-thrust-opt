@@ -20,22 +20,27 @@ if SphericalState6D(2) ~= 0
     error("No radial velocity. See Spherical2Cartesian.")
 end
 rho = SphericalState6D(1);
-SphericalState4D = SphericalState6D(3:6);
+SphericalState4D = SphericalState6D([2,3,5,6]);
 
-vTheta = SphericalState4D(2);
+theta = SphericalState4D(1);
+phi = SphericalState4D(2);
+
+vTheta = SphericalState4D(3);
 vPhi = SphericalState4D(4);
-sTheta = sin(SphericalState4D(1));
-cTheta = cos(SphericalState4D(1));
-sPhi = sin(SphericalState4D(3));
-cPhi = cos(SphericalState4D(3));
+sTheta = sin(theta);
+cTheta = cos(theta);
+sPhi = sin(phi);
+cPhi = cos(phi);
 
 CartesianState = zeros(6, 1);
 
 % Cartesian position and velocity
-p = rho * [cTheta * sTheta, sTheta * sPhi, cPhi]';                          % Position
-v = rho * [-vTheta * sTheta * sPhi + vPhi * cTheta * cPhi, ...              % Velocity
-            vTheta * cTheta * cPhi + vPhi * sTheta * cPhi, ...  
-            -vPhi * sPhi]';
+p = rho * [cTheta * sPhi;
+           sTheta * sPhi;
+           cPhi];                          % Position
+v = rho * [-vTheta * sTheta * sPhi + vPhi * cTheta * cPhi;               % Velocity
+            vTheta * cTheta * sPhi + vPhi * sTheta * cPhi;
+           -vPhi * sPhi];
 CartesianState(1:3) = p;
 CartesianState(4:6) = v;
 

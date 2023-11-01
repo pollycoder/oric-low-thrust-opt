@@ -27,7 +27,7 @@ for i=1:g
         alpha1 = ang(i);
         alpha2 = ang(j);
         T1 = diag([1, cos(alpha1), cos(alpha1)]) + ...
-             diag([0, sin(alpha1)], -1) + diag([0, -sin(alpha1)], -1);
+             diag([0, sin(alpha1)], -1) + diag([0, -sin(alpha1)], 1);
         T2 = diag([cos(alpha2), 1, cos(alpha2)]) + ...
              diag(-sin(alpha2), -2) + diag(sin(alpha2), 2);
         T = T1 * T2;
