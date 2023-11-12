@@ -28,7 +28,7 @@ sf4D = sf([2, 3, 5, 6]);
 omega = 4;
 M1 = diag([3 * omega^2, 0, -omega^2]);
 M2 = diag([2 * omega, 0], 1) + diag([-2 * omega, 0], -1);
-[T, u, s, J, rho] = cubicFitRot(x0, xf, t0, tf, M1, M2, 150);
+[T, u, s, J, rho] = cubicFitRot(x0, xf, t0, tf, M1, M2, 100);
 %[J, u, s] = cubicFit(s04D, sf4D, t0, tf, M1, M2, rho);
 
 
@@ -84,6 +84,11 @@ u1z = u(3, index)';
 quiver3(x1, y1, z1, u1x, u1y, u1z, 0.3, 'Color', 'r','LineWidth', 1);
 
 saveas(f, 'cubicFitRot', 'fig');
+
+%%
+figure
+u = u1x.^2 + u1y.^2 + u1z.^2;
+plot(tValue(index), u, 'LineWidth', 1.5);
 %
 
 
