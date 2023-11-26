@@ -8,14 +8,14 @@ clear all
 global omega alpha rho A B x0 xf
 % Constant
 omega = 4;                                  % angular velocity, 4 rad/h
-alpha = 1e5;                                % Parameter to be adjusted
+alpha = 1e6;                                % Parameter to be adjusted
 rho = 10;                                   % Distance between chief and deputy
 
 % Initial and final states
 x0 = [-rho; 0; 0; 0; 0; pi];
 xf = [0; -rho; 0; 0; 0; pi];
 t0 = 0;
-tf = 0.25 * 3600;
+tf = 0.25;
 
 % Matrix
 M1 = diag([3 * omega^2, 0, -omega^2]);
@@ -30,7 +30,7 @@ n = 50;
 tmesh = linspace(t0, tf, n);
 yguess = [8.521; -4.894; -1.854; -5.529; -8.154; -3.385; ones(6, 1)];
 solinit = bvpinit(tmesh, yguess);
-options = bvpset('Stats','on','RelTol',1e-5);
+options = bvpset('Stats','on','RelTol',1e-5, 'Nmax', 10000);
 
 sol = bvp4c(@bvpfun, @bvpbc, solinit, options);
 
