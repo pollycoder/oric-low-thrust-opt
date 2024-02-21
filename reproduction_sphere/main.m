@@ -52,7 +52,6 @@ y = XBack(2, :)';
 z = XBack(3, :)';
 
 figure
-f = figure;
 plot3(x, y, z, 'LineWidth', 2, 'Color', 'k'); hold on
 xlabel('x');
 ylabel('y');
@@ -83,7 +82,6 @@ u1y = u(2, index)';
 u1z = u(3, index)';
 quiver3(x1, y1, z1, u1x, u1y, u1z, 0.3, 'Color', 'r','LineWidth', 1);
 
-saveas(f, 'cubicFitRot', 'fig');
 
 %%
 figure

@@ -5,10 +5,9 @@ clear all
 % LEO: omega = 4 rad/h
 % P3
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-global omega alpha rho A B x0 xf t0 tf
 % Constant
 omega = 4;                                  % angular velocity, 4 rad/h
-alpha = 1e5;                                % Parameter to be adjusted
+alpha = 1e6;                                % Parameter to be adjusted
 rho = 10;                                   % Distance between chief and deputy
 
 % Initial and final states
@@ -23,28 +22,52 @@ M2 = diag([2 * omega, 0], 1) + diag([-2 * omega, 0], -1);
 A = [zeros(3), eye(3); M1, M2];
 B = [zeros(3); eye(3)];
 
-lambda_guess = [7.79e4; 9.37e4; 3.35e4; -456.09; 384.13; 165.61];
+% Initial guess for the solution 2  
+% t - [t0, tf]
+% x - x0, [1,1,1,1,1,1]
+n = 1e4;
+tmesh = linspace(t0, tf, n);
+yguess = ones(12, 1);
+solinit = bvpinit(tmesh, yguess);
+options = bvpset('Stats','on','RelTol',1e-5, 'Nmax', 100000);
 
-% x_sol is lambda
-x_sol = fsolve(@solver, lambda_guess);
+sol = bvp4c(@bvpfun, @bvpbc, solinit, options);
 
-lambda = x_sol;
+r = sol.y(1:3, :);
+v = sol.y(4:6, :);
+lambda13 = sol.y(7:9, :);
+lambda46 = sol.y(10:12, :);
+lambda = sol.y(7:12, :);
+mu = zeros(size(r, 2), 1);
+for i=1:size(r, 2)
+    mu(i) = 1 / (2 * rho^2) * (r(:, i)' * lambda46(:, i) ...
+            - v(:, i)' * v(:, i) - r(:, i)' * M1 * r(:, i) ...
+            - r(:, i)' * M2 * v(:, i));
+end
 
-[t, y] = ode45(@bvpfun, [t0, tf], [x0', lambda']);
-lambda = y(:, 7:12)';
-u = B' * lambda;
+for i=1:size(r, 2)
+    u(:, i) = 2 * mu(i) * r(:, i) - lambda46(:, i);
+end
 dJ = 0.5 .* (vecnorm(u) .* vecnorm(u));
+t = sol.x;
 J = trapz(t, dJ);
 fprintf('J = %f', J);
 
-% Plot
-subplot(2,2,1)
+% State - radius
+x1 = sol.y(1, :);
+x2 = sol.y(2, :);
+x3 = sol.y(3, :);
+x = sqrt(x1.^2 + x2.^2 + x3.^2);
+
+%% Plot
+figure
+set(gca, 'XTick', 9:0.5:11);
 plot(t, x, 'LineWidth', 1.5);
 title('State - pos');
 
 % Costate
 costate = lambda;
-subplot(2,2,2)
+figure
 plot(t, costate(1, :), 'LineWidth', 1.5);hold on
 plot(t, costate(2, :), 'LineWidth', 1.5);hold on
 plot(t, costate(3, :), 'LineWidth', 1.5);hold on
@@ -55,12 +78,12 @@ legend('costate1', 'costate2', 'costate3', 'costate4', 'costate5', 'costate6');
 title('Costate');
 
 % Control
-subplot(2,2,3)
+figure
 plot(t, dJ, 'LineWidth', 1.5);
 title('Control');
 
 % Trajectory
-subplot(2,2,4)
+figure
 r = 10;
 [X, Y, Z] = sphere;
 X2 = X * r;
@@ -87,25 +110,36 @@ title('Trajectory');
 % x: state - v and a, 6x1 vector
 % lambda: costate, 6x1 vector
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function F = solver(x)
-global x0 xf t0 tf
-initial_guess = [x0', x'];
-options = odeset('MaxStep', 1e-4, 'RelTol',1e-5,'AbsTol',1e-9);
-[t, y] = ode45(@bvpfun, [t0, tf], initial_guess);
-s = length(t);
-F = y(s, 1:6) - xf';
-end
-
 function dydt = bvpfun(t, y)
-global rho alpha A B
 dydt = zeros(12, 1);
-syms x1 x2 x3 p1 p2 p3
-C =x1^2 + x2^2 + x3^2 - rho^2;
-C_value = double(subs(C, {x1, x2, x3}, {y(1), y(2), y(3)}));
-gradC = [diff(C, x1); diff(C, x2); diff(C, x3); diff(C, p1); diff(C, p2); diff(C, p3)];
-gradC_value = double(subs(gradC, {x1, x2, x3, p1, p2, p3}, {y(1), y(2), y(3), y(4), y(5), y(6)}));
-dydt(1:6) = A * y(1:6) - B * B' * y(7:12);
-dydt(7:12) = -A' * y(7:12) - alpha * C_value * gradC_value;
+% Constant
+omega = 4;                                  % angular velocity, 4 rad/h
+rho = 10;                                   % Distance between chief and deputy
+
+% Matrix
+M1 = diag([3 * omega^2, 0, -omega^2]);
+M2 = diag([2 * omega, 0], 1) + diag([-2 * omega, 0], -1);
+A = [zeros(3), eye(3); M1, M2];
+B = [zeros(3); eye(3)];
+
+% Lagrange multiplier
+r = y(1:3);
+v = y(4:6);
+lambda13 = y(7:9);
+lambda46 = y(10:12);
+mu = 1 / (2 * rho^2) * (r' * lambda46 - v' * v - r' * M1 * r - r' * M2 * v);
+
+dydt(1:3) = v;
+dydt(4:6) = M1 * y(1:3) + M2 * v + 2 * mu * r - lambda46;
+dydt(7:9) = (4 * mu) * M1 * r - M1 * lambda46 - (2 * mu) * M2 * v + (4 * mu^2) * r - (2 * mu) * lambda46;
+dydt(10:12) = M2 * lambda46 - lambda13 + (4 * mu) * v - (2 * mu) * M2 * r;
 end
 
-
+% Boundary conditions
+function res = bvpbc(y0, yf)
+rho = 10;
+% Initial and final states
+x0 = [-rho; 0; 0; 0; 0; pi];
+xf = [0; -rho; 0; 0; 0; pi];
+res = [y0(1:6) - x0; yf(1:6) - xf];
+end
