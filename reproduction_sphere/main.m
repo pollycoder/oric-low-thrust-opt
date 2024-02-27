@@ -9,11 +9,11 @@ clear all
 % 46(4), 666-679.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 syms t
-
+tic
 x0 = [-10, 0, 0, 0, 0, pi]';
 xf = [0, -10, 0, 0, 0, pi]';
 t0 = 0;
-tf = 0.25;
+tf = 2.5;
 tValue = linspace(t0, tf, 1000);
 
 s0 = Cartesian2Spherical(x0);
@@ -33,7 +33,7 @@ M2 = diag([2 * omega, 0], 1) + diag([-2 * omega, 0], -1);
 
 
 %
-
+tSolve = toc;
 
 u = double(subs(u, t, tValue));
 s4D = double(subs(s, t, tValue'));
