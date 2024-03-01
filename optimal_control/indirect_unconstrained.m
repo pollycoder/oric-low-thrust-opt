@@ -5,6 +5,8 @@ clear all
 % LEO: omega = 4 rad/h
 % P3
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+tic
+global rho
 % Constant
 omega = 4;                                  % angular velocity, 4 rad/h
 rho = 10;                                   % Distance between chief and deputy
@@ -38,6 +40,12 @@ lambda13 = sol.y(7:9, :);
 lambda46 = sol.y(10:12, :);
 lambda = sol.y(7:12, :);
 mu = zeros(size(r, 2), 1);
+for i=1:size(r, 2)
+    C = norm(r);
+    mu(i) = 1 / (2 * rho^2) * (r(:, i)' * lambda46(:, i) ...
+            - v(:, i)' * v(:, i) - r(:, i)' * M1 * r(:, i) ...
+            - r(:, i)' * M2 * v(:, i));
+end
 
 for i=1:size(r, 2)
     u(:, i) = 2 * mu(i) * r(:, i) - lambda46(:, i);
@@ -46,18 +54,21 @@ dJ = 0.5 .* (vecnorm(u) .* vecnorm(u));
 t = sol.x;
 J = trapz(t, dJ);
 fprintf('J = %f', J);
+tSolve = toc;
 
-% State - radius
+%% State - radius
 x1 = sol.y(1, :);
 x2 = sol.y(2, :);
 x3 = sol.y(3, :);
 x = sqrt(x1.^2 + x2.^2 + x3.^2);
+x = x - rho * ones(size(x));
 
 %% Plot
 figure
 set(gca, 'XTick', 9:0.5:11);
 plot(t, x, 'LineWidth', 1.5);
 title('State - pos');
+axis equal
 
 % Costate
 costate = lambda;
@@ -73,12 +84,17 @@ title('Costate');
 
 % Control
 figure
-plot(t, dJ, 'LineWidth', 1.5);
+plot(t, sqrt(2 .* dJ), 'LineWidth', 1.5);
 title('Control');
 
 % Trajectory
 figure
-r = 10;
+r = rho;
+index = 1:1000:size(u, 2);
+uIndex = u(:, index);
+x1Index = x1(index);
+x2Index = x2(index);
+x3Index = x3(index);
 [X, Y, Z] = sphere;
 X2 = X * r;
 Y2 = Y * r;
@@ -93,7 +109,7 @@ text(x1(1), x2(1), x3(1), 'Departure');hold on
 plot3(x1(end), x2(end), x3(end), 'c*', 'LineWidth', 2);hold on
 text(x1(end), x2(end), x3(end), 'Arrival');hold on
 plot3(x1, x2, x3, 'k-', 'LineWidth', 1.5);hold on
-quiver3(x1, x2, x3, u(1, :), u(2, :), u(3, :), 0.5, 'Color', 'r','LineWidth', 1.5);
+quiver3(x1Index, x2Index, x3Index, uIndex(1, :), uIndex(2, :), uIndex(3, :), 0.3, 'Color', 'r','LineWidth', 1.5);
 title('Trajectory');
 %}
 
@@ -105,6 +121,7 @@ title('Trajectory');
 % lambda: costate, 6x1 vector
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function dydt = bvpfun(t, y)
+global rho
 dydt = zeros(12, 1);
 % Constant
 omega = 4;                                  % angular velocity, 4 rad/h
@@ -128,7 +145,7 @@ end
 
 % Boundary conditions
 function res = bvpbc(y0, yf)
-rho = 10;
+global rho
 % Initial and final states
 x0 = [-rho; 0; 0; 0; 0; pi];
 xf = [0; -rho; 0; 0; 0; pi];

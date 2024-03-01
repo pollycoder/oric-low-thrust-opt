@@ -90,6 +90,11 @@ title('Control');
 % Trajectory
 figure
 r = rho;
+index = 1:1000:size(u, 2);
+uIndex = u(:, index);
+x1Index = x1(index);
+x2Index = x2(index);
+x3Index = x3(index);
 [X, Y, Z] = sphere;
 X2 = X * r;
 Y2 = Y * r;
@@ -104,7 +109,7 @@ text(x1(1), x2(1), x3(1), 'Departure');hold on
 plot3(x1(end), x2(end), x3(end), 'c*', 'LineWidth', 2);hold on
 text(x1(end), x2(end), x3(end), 'Arrival');hold on
 plot3(x1, x2, x3, 'k-', 'LineWidth', 1.5);hold on
-quiver3(x1, x2, x3, u(1, :), u(2, :), u(3, :), 0.5, 'Color', 'r','LineWidth', 1.5);
+quiver3(x1Index, x2Index, x3Index, uIndex(1, :), uIndex(2, :), uIndex(3, :), 0.3, 'Color', 'r','LineWidth', 1.5);
 title('Trajectory');
 %}
 
