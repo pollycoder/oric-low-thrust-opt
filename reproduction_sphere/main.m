@@ -13,8 +13,9 @@ tic
 x0 = [-10, 0, 0, 0, 0, pi]';
 xf = [0, -10, 0, 0, 0, pi]';
 t0 = 0;
-tf = 2.5;
+tf = 0.25;
 tValue = linspace(t0, tf, 1000);
+g = 3;
 
 s0 = Cartesian2Spherical(x0);
 sf = Cartesian2Spherical(xf);
@@ -28,7 +29,7 @@ sf4D = sf([2, 3, 5, 6]);
 omega = 4;
 M1 = diag([3 * omega^2, 0, -omega^2]);
 M2 = diag([2 * omega, 0], 1) + diag([-2 * omega, 0], -1);
-[T, u, s, J, rho] = cubicFitRot(x0, xf, t0, tf, M1, M2, 100);
+[T, u, s, J, rho] = cubicFitRot(x0, xf, t0, tf, M1, M2, g);
 %[J, u, s] = cubicFit(s04D, sf4D, t0, tf, M1, M2, rho);
 
 

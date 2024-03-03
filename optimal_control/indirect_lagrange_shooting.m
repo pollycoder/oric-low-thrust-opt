@@ -33,7 +33,7 @@ B = [zeros(3); eye(3)];
 % Initial guess for the solution 2  
 % t - [t0, tf]
 % x - x0, [1,1,1,1,1,1]
-n = 1e6;
+n = 1e4;
 NGuess = 0;
 phif = phif + (NGuess + 1) * (2 * pi);
 thetaf = thetaf + (NGuess + 1) * (2 * pi);
@@ -41,6 +41,7 @@ phiGuess = linspace(phi0, phif, n);
 thetaGuess = linspace(theta0, thetaf, n);
 dGuess = linspace(d0, df, n);
 
+%{
 tmesh = linspace(t0, tf, n);
 
 yguess = ones(12, 1);
@@ -54,6 +55,22 @@ v = sol.y(4:6, :);
 lambda13 = sol.y(7:9, :);
 lambda46 = sol.y(10:12, :);
 lambda = sol.y(7:12, :);
+%}
+% x_sol is lambda
+
+lambda_guess = [-34792.6958353826; 44695.7246420364; 1281.52923095105; 
+                -4064.32895024187; 2220.95194316031; 60.5159711723116];
+
+options = optimoptions('fsolve','MaxFunctionEvaluations', 1e6, 'MaxIterations', 1e6);
+x_sol = fsolve(@solver, lambda_guess, options);
+lambda = x_sol;
+
+[t, y] = ode45(@bvpfun, [t0, tf], [x0', lambda']);
+lambda = y(:, 7:12)';
+lambda46 = y(:, 10:12)';
+r = y(:, 1:3)';
+v = y(:, 4:6)';
+
 mu = zeros(size(r, 2), 1);
 for i=1:size(r, 2)
     C = norm(r);
@@ -66,15 +83,15 @@ for i=1:size(r, 2)
     u(:, i) = 2 * mu(i) * r(:, i) - lambda46(:, i);
 end
 dJ = 0.5 .* (vecnorm(u) .* vecnorm(u));
-t = sol.x;
+%t = sol.x;
 J = trapz(t, dJ);
 fprintf('J = %f', J);
 tSolve = toc;
 
 %% State - radius
-x1 = sol.y(1, :);
-x2 = sol.y(2, :);
-x3 = sol.y(3, :);
+x1 = y(:, 1)';
+x2 = y(:, 2)';
+x3 = y(:, 3)';
 x = sqrt(x1.^2 + x2.^2 + x3.^2);
 x = x - rho * ones(size(x));
 
@@ -105,7 +122,7 @@ title('Control');
 % Trajectory
 figure
 r = rho;
-index = 1:1000:size(u, 2);
+index = 1:2:size(u, 2);
 uIndex = u(:, index);
 x1Index = x1(index);
 x2Index = x2(index);
@@ -154,8 +171,8 @@ mu = 1 / (2 * rho^2) * (r' * lambda46 - v' * v - r' * M1 * r - r' * M2 * v);
 
 dydt(1:3) = v;
 dydt(4:6) = M1 * y(1:3) + M2 * v + 2 * mu * r - lambda46;
-dydt(7:9) = (4 * mu) * M1 * r - M1 * lambda46 + (2 * mu) * M2 * v + (4 * mu^2) * r - (2 * mu) * lambda46;
-dydt(10:12) = -M2 * lambda46 - lambda13 + (4 * mu) * v + (2 * mu) * M2 * r;
+dydt(7:9) = (4 * mu) * M1 * r - M1 * lambda46 - (2 * mu) * M2 * v + (4 * mu^2) * r - (2 * mu) * lambda46;
+dydt(10:12) = M2 * lambda46 - lambda13 + (4 * mu) * v - (2 * mu) * M2 * r;
 end
 
 % Boundary conditions
@@ -165,4 +182,19 @@ global rho
 x0 = [-rho; 0; 0; 0; 0; pi];
 xf = [0; -rho; 0; 0; 0; pi];
 res = [y0(1:6) - x0; yf(1:6) - xf];
+end
+
+% Shooting solver
+function F = solver(x)
+global rho
+x0 = [-rho; 0; 0; 0; 0; pi];
+xf = [0; -rho; 0; 0; 0; pi];
+t0 = 0;
+tf = 0.25;
+
+initial_guess = [x0', x'];
+options = odeset('MaxStep', 1e-4, 'RelTol',1e-5,'AbsTol',1e-9);
+[t, y] = ode45(@bvpfun, [t0, tf], initial_guess);
+s = length(t);
+F = y(s, 1:6) - xf';
 end
