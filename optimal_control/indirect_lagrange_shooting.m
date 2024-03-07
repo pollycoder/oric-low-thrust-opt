@@ -6,7 +6,7 @@ clear all
 % P3
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 tic
-global rho
+global rho t0 tf
 % Constant
 omega = 4;                                  % angular velocity, 4 rad/h
 rho = 10;                                   % Distance between chief and deputy
@@ -19,7 +19,7 @@ xf = [0; -rho; 0; 0; 0; pi];
 [phif, thetaf, df] = cart2sph(xf(1), xf(2), xf(3));
 
 t0 = 0;
-tf = 0.25;
+tf = 2.5;
 
 % Transfer to 
 
@@ -41,31 +41,19 @@ phiGuess = linspace(phi0, phif, n);
 thetaGuess = linspace(theta0, thetaf, n);
 dGuess = linspace(d0, df, n);
 
-%{
-tmesh = linspace(t0, tf, n);
+lambda_guess = [-34792.7067105281
+44695.7246414663
+1281.52963852625
+-4064.33041957749
+2220.95194315077
+60.5159693866775];
 
-yguess = ones(12, 1);
-solinit = bvpinit(tmesh, yguess);
-options = bvpset('Stats','on','RelTol',1e-9, 'Nmax', 100000);
-
-sol = bvp5c(@bvpfun, @bvpbc, solinit, options);
-
-r = sol.y(1:3, :);
-v = sol.y(4:6, :);
-lambda13 = sol.y(7:9, :);
-lambda46 = sol.y(10:12, :);
-lambda = sol.y(7:12, :);
-%}
-% x_sol is lambda
-
-lambda_guess = [-34792.6958353826; 44695.7246420364; 1281.52923095105; 
-                -4064.32895024187; 2220.95194316031; 60.5159711723116];
-
-options = optimoptions('fsolve','MaxFunctionEvaluations', 1e6, 'MaxIterations', 1e6);
-x_sol = fsolve(@solver, lambda_guess, options);
+x_sol = fminsearch(@solver, lambda_guess);
+x_sol = fsolve(@solver, x_sol);
 lambda = x_sol;
 
-[t, y] = ode45(@bvpfun, [t0, tf], [x0', lambda']);
+options = odeset('MaxStep', 1e-5, 'RelTol',3e-14,'AbsTol',1e-20);
+[t, y] = ode45(@bvpfun, [t0, tf], [x0', lambda'], options);
 lambda = y(:, 7:12)';
 lambda46 = y(:, 10:12)';
 r = y(:, 1:3)';
@@ -83,7 +71,6 @@ for i=1:size(r, 2)
     u(:, i) = 2 * mu(i) * r(:, i) - lambda46(:, i);
 end
 dJ = 0.5 .* (vecnorm(u) .* vecnorm(u));
-%t = sol.x;
 J = trapz(t, dJ);
 fprintf('J = %f', J);
 tSolve = toc;
@@ -186,15 +173,13 @@ end
 
 % Shooting solver
 function F = solver(x)
-global rho
+global rho t0 tf
 x0 = [-rho; 0; 0; 0; 0; pi];
 xf = [0; -rho; 0; 0; 0; pi];
-t0 = 0;
-tf = 0.25;
 
 initial_guess = [x0', x'];
-options = odeset('MaxStep', 1e-4, 'RelTol',1e-5,'AbsTol',1e-9);
-[t, y] = ode45(@bvpfun, [t0, tf], initial_guess);
+options = odeset('MaxStep', 1e-5, 'RelTol',3e-14,'AbsTol',1e-20);
+[t, y] = ode45(@bvpfun, [t0, tf], initial_guess, options);
 s = length(t);
-F = y(s, 1:6) - xf';
+F = norm(y(s, 1:6) - xf');
 end

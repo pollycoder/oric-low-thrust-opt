@@ -33,7 +33,7 @@ B = [zeros(3); eye(3)];
 % Initial guess for the solution 2  
 % t - [t0, tf]
 % x - x0, [1,1,1,1,1,1]
-n = 1e6;
+n = 1e4;
 NGuess = 0;
 phif = phif + (NGuess + 1) * (2 * pi);
 thetaf = thetaf + (NGuess + 1) * (2 * pi);
@@ -154,8 +154,8 @@ mu = 1 / (2 * rho^2) * (r' * lambda46 - v' * v - r' * M1 * r - r' * M2 * v);
 
 dydt(1:3) = v;
 dydt(4:6) = M1 * y(1:3) + M2 * v + 2 * mu * r - lambda46;
-dydt(7:9) = (4 * mu) * M1 * r - M1 * lambda46 + (2 * mu) * M2 * v + (4 * mu^2) * r - (2 * mu) * lambda46;
-dydt(10:12) = -M2 * lambda46 - lambda13 + (4 * mu) * v + (2 * mu) * M2 * r;
+dydt(7:9) = (4 * mu) * M1 * r - M1 * lambda46 - (2 * mu) * M2 * v + (4 * mu^2) * r - (2 * mu) * lambda46;
+dydt(10:12) = M2 * lambda46 - lambda13 + (4 * mu) * v - (2 * mu) * M2 * r;
 end
 
 % Boundary conditions
