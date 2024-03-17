@@ -68,7 +68,6 @@ figure
 set(gca, 'XTick', 9:0.5:11);
 plot(t, x, 'LineWidth', 1.5);
 title('State - pos');
-axis equal
 
 % Costate
 costate = lambda;
@@ -140,7 +139,7 @@ mu = 0;
 dydt(1:3) = v;
 dydt(4:6) = M1 * y(1:3) + M2 * v + 2 * mu * r - lambda46;
 dydt(7:9) = (4 * mu) * M1 * r - M1 * lambda46 - (2 * mu) * M2 * v + (4 * mu^2) * r - (2 * mu) * lambda46;
-dydt(10:12) = M2 * lambda46 - lambda13 + (4 * mu) * v - (2 * mu) * M2 * r;
+dydt(10:12) = M2 * lambda46 - lambda13;
 end
 
 % Boundary conditions

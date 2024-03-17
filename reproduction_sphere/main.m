@@ -15,7 +15,7 @@ xf = [0, -10, 0, 0, 0, pi]';
 t0 = 0;
 tf = 0.25;
 tValue = linspace(t0, tf, 1000);
-g = 3;
+g = 6;
 
 s0 = Cartesian2Spherical(x0);
 sf = Cartesian2Spherical(xf);

@@ -99,7 +99,7 @@ title('Costate');
 
 % Control
 figure
-plot(t, dJ, 'LineWidth', 1.5);
+plot(t, vecnorm(u), 'LineWidth', 1.5);
 title('Control');
 
 % Trajectory
