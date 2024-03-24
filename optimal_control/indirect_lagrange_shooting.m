@@ -19,7 +19,7 @@ xf = [0; -rho; 0; 0; 0; pi];
 [phif, thetaf, df] = cart2sph(xf(1), xf(2), xf(3));
 
 t0 = 0;
-tf = 2.5;
+tf = 0.25;
 
 % Transfer to 
 

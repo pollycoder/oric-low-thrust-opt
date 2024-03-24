@@ -9,6 +9,7 @@ tic
 global rho
 % Constant
 omega = 4;                                  % angular velocity, 4 rad/h
+%rho0 = 10;
 rho = 10;                                   % Distance between chief and deputy
 
 % Initial and final states
@@ -26,7 +27,7 @@ B = [zeros(3); eye(3)];
 % Initial guess for the solution 2  
 % t - [t0, tf]
 % x - x0, [1,1,1,1,1,1]
-n = 1e4;
+n = 1e3;
 tmesh = linspace(t0, tf, n);
 yguess = ones(12, 1);
 solinit = bvpinit(tmesh, yguess);
@@ -42,9 +43,7 @@ lambda = sol.y(7:12, :);
 mu = zeros(size(r, 2), 1);
 for i=1:size(r, 2)
     C = norm(r);
-    mu(i) = 1 / (2 * rho^2) * (r(:, i)' * lambda46(:, i) ...
-            - v(:, i)' * v(:, i) - r(:, i)' * M1 * r(:, i) ...
-            - r(:, i)' * M2 * v(:, i));
+    mu(i) = 0;
 end
 
 for i=1:size(r, 2)
@@ -108,7 +107,7 @@ text(x1(1), x2(1), x3(1), 'Departure');hold on
 plot3(x1(end), x2(end), x3(end), 'c*', 'LineWidth', 2);hold on
 text(x1(end), x2(end), x3(end), 'Arrival');hold on
 plot3(x1, x2, x3, 'k-', 'LineWidth', 1.5);hold on
-quiver3(x1Index, x2Index, x3Index, uIndex(1, :), uIndex(2, :), uIndex(3, :), 0.3, 'Color', 'r','LineWidth', 1.5);
+%quiver3(x1Index, x2Index, x3Index, uIndex(1, :), uIndex(2, :), uIndex(3, :), 0.3, 'Color', 'r','LineWidth', 1.5);
 title('Trajectory');
 %}
 
