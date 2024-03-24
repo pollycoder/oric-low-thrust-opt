@@ -15,7 +15,7 @@ xf = [0, -10, 0, 0, 0, pi]';
 t0 = 0;
 tf = 0.25;
 tValue = linspace(t0, tf, 1000);
-g = 6;
+g = 3;
 
 s0 = Cartesian2Spherical(x0);
 sf = Cartesian2Spherical(xf);
@@ -58,7 +58,7 @@ xlabel('x');
 ylabel('y');
 zlabel('z');
 
-r = 5;
+r = rho;
 [X, Y, Z] = sphere;
 X2 = X * r;
 Y2 = Y * r;
