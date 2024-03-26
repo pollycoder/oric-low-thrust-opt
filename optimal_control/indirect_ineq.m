@@ -164,12 +164,12 @@ mu_t1p = 1 / (2 * rho^2) * ((r_t1p' * lambda_t1p46) ...
             - (v_t1p' * v_t1p) - (r_t1p' * M1 * r_t1p) ...
             - (r_t1p' * M2 * v_t1p));
 
-pi0 = (-(2 * mu_t1p) * (v_t1p' * v_t1p) + (2 * mu_t1p) * (r_t1p' * ...
+pi0 = (-(2 * mu_t1p) * (v_t1p' * v_t1p) - (2 * mu_t1p) * (r_t1p' * ...
       (M1 * r_t1p + M2 + v_t1p + u_t1))) / (4 * (r_t1p' * v_t1p));
 pi1 = mu_t1p;
 
 % Equality constraint
-res_vec = [2 * (pi0 * r_t1p + pi1 * v_t1p); -2 * pi1 * r_t1p];
+res_vec = [2 * (pi0 * r_t1p + pi1 * v_t1p); 2 * pi1 * r_t1p];
 ceq = norm(lambda_t1p - lambda_t1m - res_vec);
 end
 
