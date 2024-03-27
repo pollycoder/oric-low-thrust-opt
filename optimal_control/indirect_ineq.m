@@ -86,20 +86,28 @@ plot(t, r_norm);
 % x(1): t1                                                                
 % x(2:7): lambda-guess 1 (t0)                                            
 % x(8:13): lambda-guess 2 (tf) 
+% x(14): t2
 function J = obj_func(x)
 global x0 xf t0 tf rho M2 M1
 t1 = x(1);
+t2 = x(14);
 
 n1 = 100;
 n2 = 100;
+n3 = 100;
 t01_span = linspace(t0, t1, n1);
-t21_span = linspace(tf, t1, n2);
+t21_span = linspace(t2, t1, n2);
+t2f_span = linspace(tf, t2, n3);
 
 yt0 = [x0; x(2:7)];
 ytf = [xf; x(8:13)];
 
 [t01, y01] = ode45(@odefun_unc, t01_span, yt0);
-[t21, y21] = ode45(@odefun_con, t21_span, ytf);
+[tf2, yf2] = ode45(@odefun_unc, t2f_span, ytf);
+
+yt2 = yf2(end, :)';
+[t21, y21] = ode45(@odefun_con, t21_span, yt2);
+
 
 % State and costate
 y01 = y01';
