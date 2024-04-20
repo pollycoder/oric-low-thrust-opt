@@ -1,19 +1,20 @@
 clc
-clear all
+clear
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Indirect method
 % LEO: omega = 4 rad/h
 % P3
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 tic
-global rho
+global rho rho0
 % Constant
-omega = 4;                                  % angular velocity, 4 rad/h
-rho = 10;                                   % Distance between chief and deputy
+omega = 4;                                   % angular velocity, 4 rad/h
+rho0 = 10;                                   % Distance between chief and deputy
+rho = 11.789;
 
 % Initial and final states
-x0 = [-rho; 0; 0; 0; 0; pi];
-xf = [0; -rho; 0; 0; 0; pi];
+x0 = [-rho0; 0; 0; 0; 0; pi];
+xf = [0; -rho0; 0; 0; 0; pi];
 
 [phi0, theta0, d0] = cart2sph(x0(1), x0(2), x0(3));
 [phif, thetaf, df] = cart2sph(xf(1), xf(2), xf(3));
@@ -49,18 +50,22 @@ options = bvpset('Stats','on','RelTol',1e-9, 'Nmax', 100000);
 
 sol = bvp5c(@bvpfun, @bvpbc, solinit, options);
 
+%%
 r = sol.y(1:3, :);
 v = sol.y(4:6, :);
 lambda13 = sol.y(7:9, :);
 lambda46 = sol.y(10:12, :);
 lambda = sol.y(7:12, :);
 mu = zeros(size(r, 2), 1);
+tol = 1e-5;
+
 for i=1:size(r, 2)
     C = norm(r);
     mu(i) = 1 / (2 * rho^2) * (r(:, i)' * lambda46(:, i) ...
-            - v(:, i)' * v(:, i) - r(:, i)' * M1 * r(:, i) ...
-            - r(:, i)' * M2 * v(:, i));
+                - v(:, i)' * v(:, i) - r(:, i)' * M1 * r(:, i) ...
+                - r(:, i)' * M2 * v(:, i));
 end
+
 
 for i=1:size(r, 2)
     u(:, i) = 2 * mu(i) * r(:, i) - lambda46(:, i);
@@ -76,14 +81,13 @@ x1 = sol.y(1, :);
 x2 = sol.y(2, :);
 x3 = sol.y(3, :);
 x = sqrt(x1.^2 + x2.^2 + x3.^2);
-x = x - rho * ones(size(x));
+x = x - rho0 * ones(size(x));
 
 %% Plot
 figure
 set(gca, 'XTick', 9:0.5:11);
 plot(t, x, 'LineWidth', 1.5);
 title('State - pos');
-axis equal
 
 % Costate
 costate = lambda;
@@ -101,6 +105,11 @@ title('Costate');
 figure
 plot(t, vecnorm(u), 'LineWidth', 1.5);
 title('Control');
+
+% Multiplier
+figure
+plot(t, mu, 'LineWidth', 1.5);
+title('mu');
 
 % Trajectory
 figure
@@ -150,7 +159,7 @@ r = y(1:3);
 v = y(4:6);
 lambda13 = y(7:9);
 lambda46 = y(10:12);
-mu = 1 / (2 * rho^2) * (r' * lambda46 - v' * v - r' * M1 * r - r' * M2 * v);
+mu = 1 / (2 * (r' * r)) * (r' * lambda46 - v' * v - r' * M1 * r - r' * M2 * v);
 
 dydt(1:3) = v;
 dydt(4:6) = M1 * y(1:3) + M2 * v + 2 * mu * r - lambda46;
@@ -160,9 +169,9 @@ end
 
 % Boundary conditions
 function res = bvpbc(y0, yf)
-global rho
+global rho0
 % Initial and final states
-x0 = [-rho; 0; 0; 0; 0; pi];
-xf = [0; -rho; 0; 0; 0; pi];
+x0 = [-rho0; 0; 0; 0; 0; pi];
+xf = [0; -rho0; 0; 0; 0; pi];
 res = [y0(1:6) - x0; yf(1:6) - xf];
 end
