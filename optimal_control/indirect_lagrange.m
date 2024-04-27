@@ -6,18 +6,17 @@ clear
 % P3
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 tic
-global rho rho0
+global rho rho0 x0 xf
 % Constant
 omega = 4;                                   % angular velocity, 4 rad/h
 rho0 = 10;                                   % Distance between chief and deputy
-rho = 11.789;
+rho = 11.9;
 
 % Initial and final states
-x0 = [-rho0; 0; 0; 0; 0; pi];
-xf = [0; -rho0; 0; 0; 0; pi];
-
-[phi0, theta0, d0] = cart2sph(x0(1), x0(2), x0(3));
-[phif, thetaf, df] = cart2sph(xf(1), xf(2), xf(3));
+theta0 = random('Uniform', 0, 2*pi);
+thetaf = theta0 + pi / 2;
+x0 = [rho0 * cos(theta0); rho0 * sin(theta0); 0; 0; 0; pi];
+xf = [rho0 * cos(thetaf); rho0 * sin(thetaf); 0; 0; 0; pi];
 
 t0 = 0;
 tf = 0.25;
@@ -35,15 +34,7 @@ B = [zeros(3); eye(3)];
 % t - [t0, tf]
 % x - x0, [1,1,1,1,1,1]
 n = 1e4;
-NGuess = 0;
-phif = phif + (NGuess + 1) * (2 * pi);
-thetaf = thetaf + (NGuess + 1) * (2 * pi);
-phiGuess = linspace(phi0, phif, n);
-thetaGuess = linspace(theta0, thetaf, n);
-dGuess = linspace(d0, df, n);
-
 tmesh = linspace(t0, tf, n);
-
 yguess = ones(12, 1);
 solinit = bvpinit(tmesh, yguess);
 options = bvpset('Stats','on','RelTol',1e-9, 'Nmax', 100000);
@@ -113,16 +104,16 @@ title('mu');
 
 % Trajectory
 figure
-r = rho;
+rb = rho;
 index = 1:1000:size(u, 2);
 uIndex = u(:, index);
 x1Index = x1(index);
 x2Index = x2(index);
 x3Index = x3(index);
 [X, Y, Z] = sphere;
-X2 = X * r;
-Y2 = Y * r;
-Z2 = Z * r;
+X2 = X * rb;
+Y2 = Y * rb;
+Z2 = Z * rb;
 surf(X2, Y2, Z2,  'FaceAlpha', 0.2, 'EdgeColor', 'texturemap'); hold on
 colormap(gca, 'bone')
 axis equal
@@ -159,7 +150,7 @@ r = y(1:3);
 v = y(4:6);
 lambda13 = y(7:9);
 lambda46 = y(10:12);
-mu = 1 / (2 * (r' * r)) * (r' * lambda46 - v' * v - r' * M1 * r - r' * M2 * v);
+mu = 1 / (2 * rho^2) * (r' * lambda46 - v' * v - r' * M1 * r - r' * M2 * v);
 
 dydt(1:3) = v;
 dydt(4:6) = M1 * y(1:3) + M2 * v + 2 * mu * r - lambda46;
@@ -169,9 +160,7 @@ end
 
 % Boundary conditions
 function res = bvpbc(y0, yf)
-global rho0
+global rho0 x0 xf
 % Initial and final states
-x0 = [-rho0; 0; 0; 0; 0; pi];
-xf = [0; -rho0; 0; 0; 0; pi];
 res = [y0(1:6) - x0; yf(1:6) - xf];
 end
