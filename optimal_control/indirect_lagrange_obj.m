@@ -11,7 +11,7 @@ clc;clear
 %--------------------------- Optimization --------------------------%
 %-------------------------------------------------------------------%
 rho_init = 11.78;
-[rho, J] = fminsearch(@obj_func, rho_init);
+[rho, J] = fmincon(@obj_func, rho_init,[],[],[],[],11.6,12);
 
 
 %-------------------------------------------------------------------%
@@ -66,7 +66,7 @@ rNorm = vecnorm(r);
 rmin = min(rNorm);
 
 if rmin < rho_min
-    J = 1e6;
+    J = 2e5;
 end
 
 end
