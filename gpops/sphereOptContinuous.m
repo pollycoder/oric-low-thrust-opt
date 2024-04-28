@@ -17,7 +17,7 @@ dx(:, 1:3) = x(:, 4:6);
 dx(:, 4:6) = x(:, 1:3) * M1' + x(:, 4:6) * M2' + u;
 
 phaseout.dynamics = dx;
-phaseout.integrand = 1/2 * (u * u');
+phaseout.integrand = 1/2 * (u(:,1).^2 + u(:,2).^2 + u(:,3).^2);
 phaseout.path = sqrt(x(:, 1).^2 + x(:, 2).^2 + x(:, 3).^2);
 
 end

@@ -5,23 +5,20 @@ clear
 % LEO: omega = 4 rad/h
 % P3
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-tic
 global rho rho0 x0 xf
 % Constant
 omega = 4;                                   % angular velocity, 4 rad/h
 rho0 = 10;                                   % Distance between chief and deputy
-rho = 11.9;
+rho = 11.79868;
 
 % Initial and final states
-theta0 = random('Uniform', 0, 2*pi);
+theta0 = pi;
 thetaf = theta0 + pi / 2;
 x0 = [rho0 * cos(theta0); rho0 * sin(theta0); 0; 0; 0; pi];
 xf = [rho0 * cos(thetaf); rho0 * sin(thetaf); 0; 0; 0; pi];
 
 t0 = 0;
 tf = 0.25;
-
-% Transfer to 
 
 % Matrix
 M1 = diag([3 * omega^2, 0, -omega^2]);
@@ -33,13 +30,15 @@ B = [zeros(3); eye(3)];
 % Initial guess for the solution 2  
 % t - [t0, tf]
 % x - x0, [1,1,1,1,1,1]
-n = 1e4;
+n = 10;
 tmesh = linspace(t0, tf, n);
 yguess = ones(12, 1);
 solinit = bvpinit(tmesh, yguess);
 options = bvpset('Stats','on','RelTol',1e-9, 'Nmax', 100000);
 
+tic
 sol = bvp5c(@bvpfun, @bvpbc, solinit, options);
+tSolve = toc;
 
 %%
 r = sol.y(1:3, :);
@@ -65,19 +64,18 @@ dJ = 0.5 .* (vecnorm(u) .* vecnorm(u));
 t = sol.x;
 J = trapz(t, dJ);
 fprintf('J = %f', J);
-tSolve = toc;
+
 
 %% State - radius
-x1 = sol.y(1, :);
-x2 = sol.y(2, :);
-x3 = sol.y(3, :);
-x = sqrt(x1.^2 + x2.^2 + x3.^2);
-x = x - rho0 * ones(size(x));
+x = sol.y(1, :);
+y = sol.y(2, :);
+z = sol.y(3, :);
+r = sqrt(x.^2 + y.^2 + z.^2);
 
 %% Plot
 figure
 set(gca, 'XTick', 9:0.5:11);
-plot(t, x, 'LineWidth', 1.5);
+plot(t, r, 'LineWidth', 1.5);
 title('State - pos');
 
 % Costate
@@ -94,8 +92,19 @@ title('Costate');
 
 % Control
 figure
-plot(t, vecnorm(u), 'LineWidth', 1.5);
+u1 = u(1,:);
+u2 = u(2,:);
+u3 = u(3,:);
+u = sqrt(u1.^2 + u2.^2 + u3.^2);
+plot(t, u1, 'LineWidth', 1.5);hold on
+plot(t, u2, 'LineWidth', 1.5);hold on
+plot(t, u3, 'LineWidth', 1.5);
+legend('control1', 'control2', 'control3');
 title('Control');
+
+figure
+plot(t, u, 'LineWidth', 1.5);
+title('Control - Norm');
 
 % Multiplier
 figure
@@ -106,10 +115,6 @@ title('mu');
 figure
 rb = rho;
 index = 1:1000:size(u, 2);
-uIndex = u(:, index);
-x1Index = x1(index);
-x2Index = x2(index);
-x3Index = x3(index);
 [X, Y, Z] = sphere;
 X2 = X * rb;
 Y2 = Y * rb;
@@ -119,14 +124,14 @@ colormap(gca, 'bone')
 axis equal
 plot3(0, 0, 0, 'k*', 'LineWidth', 3);hold on
 text(0, 0, 0, 'Chief');hold on
-plot3(x1(1), x2(1), x3(1), 'g*', 'LineWidth', 2);hold on
-text(x1(1), x2(1), x3(1), 'Departure');hold on
-plot3(x1(end), x2(end), x3(end), 'c*', 'LineWidth', 2);hold on
-text(x1(end), x2(end), x3(end), 'Arrival');hold on
-plot3(x1, x2, x3, 'k-', 'LineWidth', 1.5);hold on
-quiver3(x1Index, x2Index, x3Index, uIndex(1, :), uIndex(2, :), uIndex(3, :), 0.3, 'Color', 'r','LineWidth', 1.5);
+plot3(x(1), y(1), z(1), 'g*', 'LineWidth', 2);hold on
+text(x(1), y(1), z(1), 'Departure');hold on
+plot3(x(end), y(end), z(end), 'c*', 'LineWidth', 2);hold on
+text(x(end), y(end), z(end), 'Arrival');hold on
+plot3(x, y, z, 'k-', 'LineWidth', 1.5);hold on
 title('Trajectory');
-%}
+
+save data\indirect_lag_data.mat x y z u1 u2 u3 r u mu tSolve
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Control equations
