@@ -6,7 +6,6 @@
 % Journal of Guidance, Control, and Dynamics, 2023, 46(4): 666-679. %  
 %-------------------------------------------------------------------%
 clc;clear
-global rho rho0 x0 xf
 
 %-------------------------------------------------------------------%
 %---------------------------- Constant -----------------------------%
@@ -74,6 +73,10 @@ t = sol.x;
 J = trapz(t, dJ);
 fprintf('J = %f', J);
 
+
+
+
+
 % State - radius
 x = sol.y(1, :);
 y = sol.y(2, :);
@@ -92,8 +95,7 @@ save data\indirect_lag_data.mat rho0 rho x y z u1 u2 u3 r u mu tSolve lambda t J
 %-------------------------------------------------------------------%
 %---------------------- Dynamics Equationn -------------------------%
 %-------------------------------------------------------------------%
-function dydt = bvpfun(t, y)
-global rho
+function dydt = bvpfun(t, y, rho)
 dydt = zeros(12, 1);
 
 % Constant
@@ -123,8 +125,13 @@ end
 %-------------------------------------------------------------------%
 %------------------------------ Bounds -----------------------------%
 %-------------------------------------------------------------------%
-function res = bvpbc(y0, yf)
-global rho0 x0 xf
+function res = bvpbc(y0, yf, rho)
+rho0 = 10;
+theta0 = pi;
+thetaf = theta0 + pi / 2;
+x0 = [rho0 * cos(theta0); rho0 * sin(theta0); 0; 0; 0; pi];
+xf = [rho0 * cos(thetaf); rho0 * sin(thetaf); 0; 0; 0; pi];
+
 % Initial and final states
 res = [y0(1:6) - x0; yf(1:6) - xf];
 end
