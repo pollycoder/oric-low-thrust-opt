@@ -12,7 +12,8 @@ clc;clear
 %-------------------------------------------------------------------%
 
 % GPOPS-II Data
-load("data\gpops_data.mat");
+path_gpops = "data/gpops_data.mat";
+load(path_gpops);
 x_gpops = x;
 y_gpops = y;
 z_gpops = z;
@@ -25,7 +26,8 @@ t_gpops = t;
 tSolve_gpops = tSolve;
 
 % Indirect - Lagrange Multiplier Data
-load("data\indirect_lag_data.mat");
+path_lag = "data/indirect_lag_data.mat";
+load(path_lag);
 x_lag = x;
 y_lag = y;
 z_lag = z;
@@ -38,8 +40,6 @@ t_lag = t;
 tSolve_lag = tSolve;
 lambda_lag = lambda;
 mu_lag = mu;
-
-
 
 
 %-------------------------------------------------------------------%
