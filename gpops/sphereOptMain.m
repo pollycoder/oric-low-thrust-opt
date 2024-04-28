@@ -154,6 +154,7 @@ setup.method = 'RPMintegration';
 %-------------------------------------------------------------------%
 output = gpops2(setup);
 solution = output.result.solution;
+J = solution.phase.integral;
 
 
 %-------------------------------------------------------------------%
@@ -170,4 +171,4 @@ u3 = solution.phase.control(:, 3);
 u = sqrt(u1.^2 + u2.^2 + u3.^2);
 tSolve = output.result.nlptime;
 
-save data\gpops_data.mat x y z u1 u2 u3 r u tSolve t
+save data\gpops_data.mat x y z u1 u2 u3 r u tSolve t J
