@@ -47,15 +47,16 @@ mu_lag = mu;
 %-------------------------------------------------------------------%
 
 %------------------------------- State -----------------------------%
-figure
+f=figure
 plot(t_lag, r_lag, 'LineWidth', 1.5);hold on
 plot(t_gpops, r_gpops, 'LineWidth', 1.5);
 legend('Indirect Method', 'GPOPS-II');
 title('State - pos');
+saveas(f, 'fig/state','fig');
 
 %------------------------------ Costate ----------------------------%
 costate = lambda;
-figure
+f=figure
 plot(t, costate(1, :), 'LineWidth', 1.5);hold on
 plot(t, costate(2, :), 'LineWidth', 1.5);hold on
 plot(t, costate(3, :), 'LineWidth', 1.5);hold on
@@ -64,9 +65,11 @@ plot(t, costate(5, :), 'LineWidth', 1.5);hold on
 plot(t, costate(6, :), 'LineWidth', 1.5);
 legend('costate1', 'costate2', 'costate3', 'costate4', 'costate5', 'costate6');
 title('Indirect Method - Costate');
+saveas(f, 'fig/costate','fig');
+
 
 %------------------------------ Control ----------------------------%
-figure
+f=figure
 plot(t_lag, u1_lag, 'LineWidth', 1.5, ...
     'LineStyle', '-', 'Color', "#A2142F");hold on
 plot(t_lag, u2_lag, 'LineWidth', 1.5, ...
@@ -83,21 +86,24 @@ legend('control1 - Indirect', 'control2 - Indirect', ...
        'control3 - Indirect', 'control1 - GPOPS-II', ...
        'control2 - GPOPS-II', 'control3 - GPOPS-II');
 title('Control');
+saveas(f, 'fig/control','fig');
 
-%--------------------------- Trajectory ----------------------------%
-figure
+%------------------------ Norm of Control --------------------------%
+f=figure
 plot(t_lag, u_lag, 'LineWidth', 1.5, 'Color', "#0072BD");hold on
 plot(t_gpops, u_gpops, 'LineWidth', 1.5, 'Color', "#A2142F");hold on
 legend('control - Indirect', 'control - GPOPS-II');
 title('Control - Norm');
+saveas(f, 'fig/controlNorm','fig');
 
-% Multiplier
-figure
+%--------------------------- Multiplier ----------------------------%
+f=figure
 plot(t, mu_lag, 'LineWidth', 1.5);
 title('mu');
+saveas(f, 'fig/mu','fig');
 
-% Trajectory
-figure
+%--------------------------- Trajectory ----------------------------%
+f=figure
 plot3(x_lag, y_lag, z_lag, 'LineWidth', 1.5, 'Color', "#A2142F");hold on
 plot3(x_gpops, y_gpops, z_gpops, 'LineWidth', 1.5, 'Color', "#0072BD");hold on
 
@@ -120,3 +126,4 @@ axis equal
 
 legend('Indirect', 'GPOPS-II');
 title('Trajectory');
+saveas(f, 'fig/trajectory','fig');
