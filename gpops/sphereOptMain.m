@@ -7,6 +7,7 @@
 %-------------------------------------------------------------------%
 clc;clear
 tic
+
 %-------------------------------------------------------------------%
 %---------------------------- Constant -----------------------------%
 %-------------------------------------------------------------------%
@@ -152,54 +153,21 @@ setup.method = 'RPMintegration';
 %------------------- Solve Problem Using GPOPS2 --------------------%
 %-------------------------------------------------------------------%
 output = gpops2(setup);
-tSolve = output.result.nlptime;
 solution = output.result.solution;
 
 
-%%
+%-------------------------------------------------------------------%
+%---------------------------- Save Data ----------------------------%
+%-------------------------------------------------------------------%
 t = solution.phase.time;
-
-figure
 x = solution.phase.state(:, 1);
 y = solution.phase.state(:, 2);
 z = solution.phase.state(:, 3);
 r = sqrt(x.^2 + y.^2 + z.^2);
-plot(t, r, 'LineWidth', 1.5);
-title('State - pos');
-
-figure
 u1 = solution.phase.control(:, 1);
 u2 = solution.phase.control(:, 2);
 u3 = solution.phase.control(:, 3);
 u = sqrt(u1.^2 + u2.^2 + u3.^2);
-plot(t, u1, 'LineWidth', 1.5);hold on
-plot(t, u2, 'LineWidth', 1.5);hold on
-plot(t, u3, 'LineWidth', 1.5);hold on
-legend('u1', 'u2', 'u3');
-title('Control');
+tSolve = output.result.nlptime;
 
-figure
-plot(t, u, 'LineWidth', 1.5);
-title('Control - Norm');
-
-% Trajectory
-figure
-rb = rho0;
-index = 1:1000:size(u, 2);
-[X, Y, Z] = sphere;
-X2 = X * rb;
-Y2 = Y * rb;
-Z2 = Z * rb;
-surf(X2, Y2, Z2,  'FaceAlpha', 0.2, 'EdgeColor', 'texturemap'); hold on
-colormap(gca, 'bone')
-axis equal
-plot3(0, 0, 0, 'k*', 'LineWidth', 3);hold on
-text(0, 0, 0, 'Chief');hold on
-plot3(x(1), y(1), z(1), 'g*', 'LineWidth', 2);hold on
-text(x(1), y(1), z(1), 'Departure');hold on
-plot3(x(end), y(end), z(end), 'c*', 'LineWidth', 2);hold on
-text(x(end), y(end), z(end), 'Arrival');hold on
-plot3(x, y, z, 'k-', 'LineWidth', 1.5);hold on
-title('Trajectory');
-
-save data\gpops_data.mat x y z u1 u2 u3 r u tSolve
+save data\gpops_data.mat x y z u1 u2 u3 r u tSolve t
