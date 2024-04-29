@@ -122,12 +122,12 @@ guess.phase.integral = 0;
 %-------------------------------- Mesh -----------------------------%
 %-------------------------------------------------------------------%
 mesh.method = 'hp1';
-mesh.tolerance = 1e-9; 
+mesh.tolerance = 1e-8; 
 mesh.maxiteration = 1000;
 mesh.colpointmin = 4;
 mesh.colpointmax = 50;
-mesh.phase.colpoints = 4*ones(1,50);
-mesh.phase.fraction = 0.02*ones(1,50);
+mesh.phase.colpoints = 4*ones(1,10);
+mesh.phase.fraction = 0.1*ones(1,10);
 
 
 

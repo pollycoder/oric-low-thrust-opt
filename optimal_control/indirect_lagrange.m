@@ -13,7 +13,7 @@ global rho rho0 x0 xf
 %-------------------------------------------------------------------%
 omega = 4;                                   % angular velocity, 4 rad/h
 rho0 = 10;                                   % Distance between chief and deputy
-rho = 11.7985884;
+rho = 11.798518482474986;
 
 % Initial and final states
 theta0 = pi;
