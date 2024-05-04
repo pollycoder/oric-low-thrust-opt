@@ -9,7 +9,7 @@ tic
 global omega alpha rho A B x0 xf
 % Constant
 omega = 4;                                  % angular velocity, 4 rad/h
-alpha = 1e6;                                % Parameter to be adjusted
+alpha = 1e7;                                % Parameter to be adjusted
 rho = 10;                                   % Distance between chief and deputy
 
 % Initial and final states

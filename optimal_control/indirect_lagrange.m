@@ -13,7 +13,7 @@ global rho rho0 x0 xf
 %-------------------------------------------------------------------%
 omega = 4;                                   % angular velocity, 4 rad/h
 rho0 = 10;                                   % Distance between chief and deputy
-rho = 11.798518482474986;
+rho = 10;
 
 % Initial and final states
 theta0 = pi;
@@ -86,7 +86,7 @@ u2 = u(2,:);
 u3 = u(3,:);
 u = sqrt(u1.^2 + u2.^2 + u3.^2);
 
-save data\indirect_lag_data.mat rho0 rho x y z u1 u2 u3 r u mu tSolve lambda t J
+save data\indirect_eq_data.mat rho0 rho x y z u1 u2 u3 r u mu tSolve lambda t J
 
 
 %-------------------------------------------------------------------%

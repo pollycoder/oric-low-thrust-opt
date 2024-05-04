@@ -12,7 +12,7 @@ clc;clear
 %-------------------------------------------------------------------%
 
 % GPOPS-II Data
-path_gpops = "data/gpops_data.mat";
+path_gpops = "data/gpops_eq_data.mat";
 load(path_gpops);
 x_gpops = x;
 y_gpops = y;
@@ -26,7 +26,7 @@ t_gpops = t;
 tSolve_gpops = tSolve;
 
 % Indirect - Lagrange Multiplier Data
-path_lag = "data/indirect_lag_data.mat";
+path_lag = "data/indirect_eq_data.mat";
 load(path_lag);
 x_lag = x;
 y_lag = y;
@@ -45,7 +45,7 @@ mu_lag = mu;
 %-------------------------------------------------------------------%
 %-------------------------- Error Analysis -------------------------%
 %-------------------------------------------------------------------%
-rho_ineq = 8;
+rho_ineq = 10;
 res_gpops = min(r_gpops) - rho_ineq;
 res_lag = min(r_lag) - rho_ineq;
 
@@ -55,16 +55,17 @@ res_lag = min(r_lag) - rho_ineq;
 %-------------------------------------------------------------------%
 
 %------------------------------- State -----------------------------%
-f=figure
+f=figure;
 plot(t_lag, r_lag, 'LineWidth', 1.5);hold on
 plot(t_gpops, r_gpops, 'LineWidth', 1.5);
 legend('Indirect Method', 'GPOPS-II');
 title('State - pos');
+axis equal
 saveas(f, 'fig/state','fig');
 
 %------------------------------ Costate ----------------------------%
 costate = lambda;
-f=figure
+f=figure;
 plot(t, costate(1, :), 'LineWidth', 1.5);hold on
 plot(t, costate(2, :), 'LineWidth', 1.5);hold on
 plot(t, costate(3, :), 'LineWidth', 1.5);hold on
@@ -77,7 +78,7 @@ saveas(f, 'fig/costate','fig');
 
 
 %------------------------------ Control ----------------------------%
-f=figure
+f=figure;
 plot(t_lag, u1_lag, 'LineWidth', 1.5, ...
     'LineStyle', '-', 'Color', "#A2142F");hold on
 plot(t_lag, u2_lag, 'LineWidth', 1.5, ...
@@ -97,7 +98,7 @@ title('Control');
 saveas(f, 'fig/control','fig');
 
 %------------------------ Norm of Control --------------------------%
-f=figure
+f=figure;
 plot(t_lag, u_lag, 'LineWidth', 1.5, 'Color', "#0072BD");hold on
 plot(t_gpops, u_gpops, 'LineWidth', 1.5, 'Color', "#A2142F");hold on
 legend('control - Indirect', 'control - GPOPS-II');
@@ -105,13 +106,13 @@ title('Control - Norm');
 saveas(f, 'fig/controlNorm','fig');
 
 %--------------------------- Multiplier ----------------------------%
-f=figure
+f=figure;
 plot(t, mu_lag, 'LineWidth', 1.5);
 title('mu');
 saveas(f, 'fig/mu','fig');
 
 %--------------------------- Trajectory ----------------------------%
-f=figure
+f=figure;  
 plot3(x_lag, y_lag, z_lag, 'LineWidth', 1.5, 'Color', "#A2142F");hold on
 plot3(x_gpops, y_gpops, z_gpops, 'LineWidth', 1.5, 'Color', "#0072BD");hold on
 
