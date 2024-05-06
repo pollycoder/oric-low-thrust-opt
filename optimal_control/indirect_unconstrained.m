@@ -16,7 +16,7 @@ rho = 10;                                   % Distance between chief and deputy
 x0 = [-rho; 0; 0; 0; 0; pi];
 xf = [0; -rho; 0; 0; 0; pi];
 t0 = 0;
-tf = 0.25;
+tf = 0.25   ;
 
 % Matrix
 M1 = diag([3 * omega^2, 0, -omega^2]);
@@ -29,7 +29,7 @@ B = [zeros(3); eye(3)];
 % x - x0, [1,1,1,1,1,1]
 n = 1e3;
 tmesh = linspace(t0, tf, n);
-yguess = ones(12, 1);
+yguess = 10*ones(12, 1);
 solinit = bvpinit(tmesh, yguess);
 options = bvpset('Stats','on','RelTol',1e-9, 'Nmax', 100000);
 

@@ -79,7 +79,7 @@ bounds.phase.path.upper = rho_ub;
 
 %------------------------------ Guess ------------------------------%
 % Use spherical coordinate to guess position
-N = 100;
+N = 1000;
 thetaGuess = zeros(N, 1);
 thetaGuess(:) = linspace(theta0, thetaf, N);
 rhoGuess = zeros(N, 1);
@@ -164,11 +164,28 @@ t = solution.phase.time;
 x = solution.phase.state(:, 1);
 y = solution.phase.state(:, 2);
 z = solution.phase.state(:, 3);
+vx = solution.phase.state(:, 4);
+vy = solution.phase.state(:, 5);
+vz = solution.phase.state(:, 6);
 r = sqrt(x.^2 + y.^2 + z.^2);
+costate1 = solution.phase.costate(:, 1);
+costate2 = solution.phase.costate(:, 2);
+costate3 = solution.phase.costate(:, 3);
+costate4 = solution.phase.costate(:, 4);
+costate5 = solution.phase.costate(:, 5);
+costate6 = solution.phase.costate(:, 6);
 u1 = solution.phase.control(:, 1);
 u2 = solution.phase.control(:, 2);
 u3 = solution.phase.control(:, 3);
 u = sqrt(u1.^2 + u2.^2 + u3.^2);
 tSolve = output.result.nlptime;
+
+
+for i=1:length(t)
+    mu(i) = 1 / (2 * rho_lb^2) * (x(i)*costate4(i)+y(i)*costate5(i)+z(i)*costate6(i) ...
+                - (vx(i)^2+vy(i)^2+vz(i)^2) - [x(i);y(i);z(i)]' * auxdata.M1 * [x(i);y(i);z(i)] ...
+                - [x(i);y(i);z(i)]' * auxdata.M2 * [vx(i);vy(i);vz(i)]);
+end
+plot(t,mu);
 
 save data\gpops_data.mat x y z u1 u2 u3 r u tSolve t J
