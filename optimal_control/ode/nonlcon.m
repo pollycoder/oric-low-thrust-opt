@@ -1,11 +1,4 @@
-%-------------------------------------------------------------------%
-% Indirect method  - Interior point constraint  (2 points)          %
-% Objective Function - Residual                                     %
-% Reference: Woodford N T, Harris M W, Petersen C D. Spherically    %
-% constrained relative motion trajectories in low earth orbit[J].   %
-% Journal of Guidance, Control, and Dynamics, 2023, 46(4): 666-679. %  
-%-------------------------------------------------------------------%
-function J = obj_res(X)
+function [c, ceq] = nonlcon(X)
 % "*_p" <==> "t+"
 % "*_m" <==> "t-"
 % X: dt1, dt2, lambda0(6), lambda1+(6), lambda2+(6), 
@@ -93,15 +86,42 @@ lambda2m = y2m(7:12);
 [t2f, y2f] = ode45(@odefun_off, [t2, tf], y2p_guess);
 yf = y2f(end, :)';
 
-%------------------------------ Index ------------------------------%
-t = [t01; t12; t2f];
-u = -[y01(:, 10:12)', y12(:, 10:12)', y2f(:, 10:12)'];
-unorm = vecnorm(u);
-dJ = 0.5*unorm.^2;
-J = trapz(t, dJ);
+%---------------------------- Residuals -----------------------------%
+% Res1: final state
+res1 = yf(1:6) - statef;
+
+% Res2: joint points jump and state continuity - t1
+r = y1p_guess(1:3);
+v = y1p_guess(4:6);
+lambda13m = y1m(7:9);
+lambda46m = y1m(10:12);
+lambda13p = y1p_guess(7:9);
+lambda46p = y1p_guess(10:12);
+mu1p = 1 / (2 * rho^2) * (r' * lambda46p - v' * v ...
+                        - r' * M1 * r - r' * M2 * v);
+res2 = [y1p_guess(1:6) - y1m(1:6)];
+        %lambda13p - mu1p * r - lambda13m;
+        %lambda46p - lambda46m];
+
+% Res3: joint points jump and state continuity - t2
+r = y2p_guess(1:3);
+v = y2p_guess(4:6);
+lambda13m = y2m(7:9);
+lambda46m = y2m(10:12);
+lambda13p = y2p_guess(7:9);
+lambda46p = y2p_guess(10:12);
+mu2p = 1 / (2 * rho^2) * (r' * lambda46m - v' * v ...
+                        - r' * M1 * r - r' * M2 * v);
+res3 = [y2p_guess(1:6) - y2m(1:6)];
+        %lambda13p + mu2p * r - lambda13m;
+        %lambda46p - lambda46m];
+
+% Res4: tangent condition
+res4 = [dot(r1guess, v1guess); dot(r2guess, v2guess)];
+
+% Final residual
+ceq = [res1; res2; res3; res4];
+c = [];
 
 end
-
-
-
 
