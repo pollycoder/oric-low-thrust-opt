@@ -14,17 +14,14 @@ function J = obj_res(X)
 %-------------------------------------------------------------------%
 %---------------------------- Constant -----------------------------%
 %-------------------------------------------------------------------%
-rho = 8; 
-rho0 = 10; omega = 4;
-theta0 = pi; thetaf = theta0 + pi/2;
-M1 = diag([3 * omega^2, 0, -omega^2]);
-M2 = diag([2 * omega, 0], 1) + diag([-2 * omega, 0], -1);
+rho = 9; 
+rho0 = 10;
+theta0 = pi;
 
 t0 = 0; tf = 0.25;
 dt1 = X(1); dt2 = X(2);
 t1 = t0 + dt1; t2 = t1 + dt2;
 state0 = [rho0 * cos(theta0); rho0 * sin(theta0); 0; 0; 0; pi];
-statef = [rho0 * cos(thetaf); rho0 * sin(thetaf); 0; 0; 0; pi];
 
 
 %-------------------------------------------------------------------%
@@ -81,17 +78,12 @@ y2p_guess = [state2_guess; lambda2p_guess];
 
 % Arc1: off
 [t01, y01] = ode45(@odefun_off, [t0, t1], y0_guess);
-y1m = y01(end, :)';
-lambda1m = y1m(7:12);
 
 % Arc1: on
 [t12, y12] = ode45(@odefun_on, [t1, t2], y1p_guess);
-y2m = y12(end, :)';
-lambda2m = y2m(7:12);
 
 % Arc3: off
 [t2f, y2f] = ode45(@odefun_off, [t2, tf], y2p_guess);
-yf = y2f(end, :)';
 
 %------------------------------ Index ------------------------------%
 t = [t01; t12; t2f];

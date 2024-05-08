@@ -8,11 +8,8 @@ function [c, ceq] = nonlcon(X)
 %---------------------------- Constant -----------------------------%
 %-------------------------------------------------------------------%
 rho = 8; 
-rho0 = 10; omega = 4;
+rho0 = 10;
 theta0 = pi; thetaf = theta0 + pi/2;
-M1 = diag([3 * omega^2, 0, -omega^2]);
-M2 = diag([2 * omega, 0], 1) + diag([-2 * omega, 0], -1);
-
 t0 = 0; tf = 0.25;
 dt1 = X(1); dt2 = X(2);
 t1 = t0 + dt1; t2 = t1 + dt2;
@@ -73,17 +70,15 @@ y1p_guess = [state1_guess; lambda1p_guess];
 y2p_guess = [state2_guess; lambda2p_guess];
 
 % Arc1: off
-[t01, y01] = ode45(@odefun_off, [t0, t1], y0_guess);
+[~, y01] = ode45(@odefun_off, [t0, t1], y0_guess);
 y1m = y01(end, :)';
-lambda1m = y1m(7:12);
 
 % Arc1: on
-[t12, y12] = ode45(@odefun_on, [t1, t2], y1p_guess);
+[~, y12] = ode45(@odefun_on, [t1, t2], y1p_guess);
 y2m = y12(end, :)';
-lambda2m = y2m(7:12);
 
 % Arc3: off
-[t2f, y2f] = ode45(@odefun_off, [t2, tf], y2p_guess);
+[~, y2f] = ode45(@odefun_off, [t2, tf], y2p_guess);
 yf = y2f(end, :)';
 
 %---------------------------- Residuals -----------------------------%
@@ -91,37 +86,25 @@ yf = y2f(end, :)';
 res1 = yf(1:6) - statef;
 
 % Res2: joint points jump and state continuity - t1
-r = y1p_guess(1:3);
-v = y1p_guess(4:6);
-lambda13m = y1m(7:9);
-lambda46m = y1m(10:12);
-lambda13p = y1p_guess(7:9);
-lambda46p = y1p_guess(10:12);
-mu1p = 1 / (2 * rho^2) * (r' * lambda46p - v' * v ...
-                        - r' * M1 * r - r' * M2 * v);
-res2 = [y1p_guess(1:6) - y1m(1:6)];
-        %lambda13p - mu1p * r - lambda13m;
-        %lambda46p - lambda46m];
+res2 = y1p_guess(1:6) - y1m(1:6);
 
 % Res3: joint points jump and state continuity - t2
-r = y2p_guess(1:3);
-v = y2p_guess(4:6);
-lambda13m = y2m(7:9);
-lambda46m = y2m(10:12);
-lambda13p = y2p_guess(7:9);
-lambda46p = y2p_guess(10:12);
-mu2p = 1 / (2 * rho^2) * (r' * lambda46m - v' * v ...
-                        - r' * M1 * r - r' * M2 * v);
-res3 = [y2p_guess(1:6) - y2m(1:6)];
-        %lambda13p + mu2p * r - lambda13m;
-        %lambda46p - lambda46m];
+res3 = y2p_guess(1:6) - y2m(1:6);
 
 % Res4: tangent condition
 res4 = [dot(r1guess, v1guess); dot(r2guess, v2guess)];
 
+% Constriant
+x = [y01(:,1);y12(:,1);y2f(:,1)];
+y = [y01(:,2);y12(:,2);y2f(:,2)];
+z = [y01(:,3);y12(:,3);y2f(:,3)];
+r = sqrt(x.^2 + y.^2 + z.^2);
+rbase = rho .* ones(size(r));
+
 % Final residual
 ceq = [res1; res2; res3; res4];
-c = [];
+
+c = max(rbase - r);
 
 end
 

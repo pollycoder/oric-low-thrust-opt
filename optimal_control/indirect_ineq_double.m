@@ -26,14 +26,12 @@ lambda2 = [-27573.7462572614
             -891.282009812638	
             0.331116284423432];
 
-X0 = [0.1244; 1e-5; lambda0;lambda1;lambda2;
+X0 = [0.1243; 0.1244; lambda0;lambda1;lambda2;
       pi*1.25; 0; pi*1.25; 0; 
-      40; -70; 0.1; 40; -70; -0.1];
-res0 = obj_res(X0);
-n = 0;
+      50; -50; -1; 50; -50; -1];
 t0 = 0; tf = 0.25;
 
-tol = 1e-8;
+tol = 1e-7;
 A = zeros(3, 30);
 A(1,1) = -1;
 A(2,2) = -1;
@@ -146,9 +144,9 @@ lambda13p = y1p_guess(7:9);
 lambda46p = y1p_guess(10:12);
 mu1p = 1 / (2 * rho^2) * (r' * lambda46p - v' * v ...
                         - r' * M1 * r - r' * M2 * v);
-res2 = y1p_guess(1:6) - y1m(1:6); 
-        %lambda13p - mu1p * r - lambda13m;
-        %lambda46p - lambda46m];
+res2 = [y1p_guess(1:6) - y1m(1:6); 
+        lambda13p - lambda13m - mu1p * r;
+        lambda46p - lambda46m];
 
 % Res3: joint points jump and state continuity - t2
 r = y2p_guess(1:3);
@@ -159,9 +157,9 @@ lambda13p = y2p_guess(7:9);
 lambda46p = y2p_guess(10:12);
 mu2p = 1 / (2 * rho^2) * (r' * lambda46m - v' * v ...
                         - r' * M1 * r - r' * M2 * v);
-res3 = y2p_guess(1:6) - y2m(1:6); 
-        %lambda13p + mu2p * r - lambda13m;
-        %lambda46p - lambda46m];
+res3 = [y2p_guess(1:6) - y2m(1:6); 
+        lambda13p + mu2p * r - lambda13m;
+        lambda46p - lambda46m];
 
 % Final residual
 res = [res1; res2; res3];
@@ -179,23 +177,32 @@ costate = [y01(:, 7:12)', y12(:, 7:12)', y2f(:, 7:12)'];
 unorm = vecnorm(u);
 dJ = 0.5*unorm.^2;
 J = trapz(t, dJ);
+
 figure
 plot(t, r);
+title('State')
+
 figure
-plot(t, costate(1,:));hold on
-plot(t, costate(2,:));hold on
-plot(t, costate(3,:));hold on
-plot(t, costate(4,:));hold on
-plot(t, costate(5,:));hold on
-plot(t, costate(6,:));hold on
+plot(t, costate(1,:), 'LineWidth', 1.5);hold on
+plot(t, costate(2,:), 'LineWidth', 1.5);hold on
+plot(t, costate(3,:), 'LineWidth', 1.5);hold on
+plot(t, costate(4,:), 'LineWidth', 1.5);hold on
+plot(t, costate(5,:), 'LineWidth', 1.5);hold on
+plot(t, costate(6,:), 'LineWidth', 1.5);hold on
+legend('costate1', 'costate2', 'costate3', 'costate4', ...
+       'costate5', 'costate6')
+title('Costate')
+
 figure
-plot(t, u(1,:));hold on
-plot(t, u(2,:));hold on
-plot(t, u(3,:));hold on
+plot(t, u(1,:), 'LineWidth', 1.5);hold on
+plot(t, u(2,:), 'LineWidth', 1.5);hold on
+plot(t, u(3,:), 'LineWidth', 1.5);hold on
+legend('control1', 'control2', 'control3')
+title('Control')
 
 figure
 plot(t, unorm);hold on
-
+title('UNorm')
 
 
 
