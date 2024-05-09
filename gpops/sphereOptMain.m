@@ -20,7 +20,7 @@ auxdata.M2 = diag([2 * omega, 0], 1) + diag([-2 * omega, 0], -1);
 % Distance - initial, final, bounds
 rho0 = 10;
 rhof = 10;
-rho_lb = 8;
+rho_lb = 9;
 rho_ub = 10;
 
 % Time - initial, final
@@ -38,9 +38,9 @@ xf = [rho0*[cos(thetaf), sin(thetaf), 0], vf];
 % Bounds
 rmax = rho_ub;
 rmin = -rmax;
-vmax = 65;
+vmax = 200;
 vmin = -vmax;
-umax = 1400;
+umax = 4000;
 umin = -umax;
 
 

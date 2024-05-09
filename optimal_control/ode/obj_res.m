@@ -70,6 +70,8 @@ state2_guess = [r2guess; v2guess];
 %-------------------------------------------------------------------%
 %--------------------------- State Guess ---------------------------%
 %-------------------------------------------------------------------%
+options = odeset('RelTol', 1e-12, 'AbsTol', 1e-10, ...
+                 'NormControl','on');
 
 %------------------------ Multiple Shooting ------------------------%
 y0_guess = [state0; lambda0];
@@ -77,20 +79,25 @@ y1p_guess = [state1_guess; lambda1p_guess];
 y2p_guess = [state2_guess; lambda2p_guess];
 
 % Arc1: off
-[t01, y01] = ode45(@odefun_off, [t0, t1], y0_guess);
+[t01, y01] = ode45(@odefun_off, [t0, t1], y0_guess, options);
 
 % Arc1: on
-[t12, y12] = ode45(@odefun_on, [t1, t2], y1p_guess);
+[t12, y12] = ode45(@odefun_on, [t1, t2], y1p_guess, options);
 
 % Arc3: off
-[t2f, y2f] = ode45(@odefun_off, [t2, tf], y2p_guess);
+[t2f, y2f] = ode45(@odefun_off, [t2, tf], y2p_guess, options);
 
 %------------------------------ Index ------------------------------%
-t = [t01; t12; t2f];
-u = -[y01(:, 10:12)', y12(:, 10:12)', y2f(:, 10:12)'];
-unorm = vecnorm(u);
-dJ = 0.5*unorm.^2;
-J = trapz(t, dJ);
+u01 = -y01(:, 10:12)';
+u12 = -y12(:, 10:12)';
+u2f = -y2f(:, 10:12)';
+u01norm = vecnorm(u01);
+u12norm = vecnorm(u12);
+u2fnorm = vecnorm(u2f);
+dJ01 = 0.5*u01norm.^2;
+dJ12 = 0.5*u12norm.^2;
+dJ2f = 0.5*u2fnorm.^2;
+J = trapz(t01, dJ01) + trapz(t12, dJ12) + trapz(t2f, dJ2f);
 
 end
 

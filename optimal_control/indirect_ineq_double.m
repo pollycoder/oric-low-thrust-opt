@@ -7,31 +7,37 @@
 %-------------------------------------------------------------------%
 clc;clear
 
-lambda0 = [-8488.56386370120	
-            26299.8437937099	
-            529.325246545735	
-            -1862.30789185224	
-            1119.73400284263	
-            72.6080715242726];
-lambda1 = [-17140.5777965151	
-            10387.3458218917	
-            609.744314834945	
-            -1143.63936992369	
-            -893.419700734222	
-            0.612161804832503];
-lambda2 = [-27573.7462572614	
-            27.4214092241810	
-            612.596813195079	
-            -1136.30407075007	
-            -891.282009812638	
-            0.331116284423432];
-
-X0 = [0.1243; 0.1244; lambda0;lambda1;lambda2;
-      pi*1.25; 0; pi*1.25; 0; 
-      50; -50; -1; 50; -50; -1];
+lambda0 = [22.9444423724889	
+           33530.8874064454	
+           463.372437424655	
+           -1486.67431726342	
+           1613.82304610368	
+           69.1580010840004];
+lambda1 = [-16450.1815123402	
+            19001.2973265684	
+            673.740161518210	
+           -1414.68332810443	
+           -717.708453657806
+            18.5528906459845];
+lambda2 = [-30850.6541415830	
+           -3700.71005509594	
+            616.707806830944	
+           -859.126418227609	
+           -1002.92293539350	
+           -14.7458926735603];
+t1 = 0.0998167723302513;
+t2 = 0.149074508752072;
+v1 = [41.6148287058002; -64.7193778424496; -1.36570613231753];
+v2 = [62.6476324259827; -42.7456628770326; -1.56291874984878];
+theta1 = -2.55949814018984;
+theta2 = -2.14145326036684;
+phi1 = 0.00505190120742112;
+phi2 = -0.00364951776919052;
+X0 = [t1; t2-t1; lambda0;lambda1;lambda2; 
+      theta1; phi1; theta2; phi2; v1; v2];
 t0 = 0; tf = 0.25;
 
-tol = 1e-7;
+tol = 0.04;
 A = zeros(3, 30);
 A(1,1) = -1;
 A(2,2) = -1;
@@ -41,18 +47,19 @@ b(1) = -tol;
 b(2) = -tol;
 b(3) = tf - t0;
 options = optimoptions("fmincon", ...
-                       "ConstraintTolerance", 1e-8, ...
-                       "FunctionTolerance", 1e-8, ...
-                       "MaxIterations", 1e5, ...
+                       "ConstraintTolerance", 1e-12, ...
+                       "FunctionTolerance", 1e-12, ...
+                       "MaxIterations", 1e6, ...
                        "UseParallel",true, ...
-                       "MaxFunctionEvaluations", 4e5);
+                       "MaxFunctionEvaluations", 5e5, ...
+                       "StepTolerance", 1e-15);
 [X, J] = fmincon(@obj_res, X0, A, b, [],[],[],[], @nonlcon,options);
 
-%%
+tic
 %-------------------------------------------------------------------%
 %---------------------------- Constant -----------------------------%
 %-------------------------------------------------------------------%
-rho = 8; 
+rho = 9; 
 rho0 = 10; omega = 4;
 theta0 = pi; thetaf = theta0 + pi/2;
 M1 = diag([3 * omega^2, 0, -omega^2]);
@@ -109,100 +116,108 @@ state2_guess = [r2guess; v2guess];
 
 
 %-------------------------------------------------------------------%
-%--------------------------- State Guess ---------------------------%
-%-------------------------------------------------------------------%
-
 %------------------------ Multiple Shooting ------------------------%
+%-------------------------------------------------------------------%
+options = odeset('RelTol', 1e-12, 'AbsTol', 1e-10, ...
+                 'NormControl','on');
+
+% y-guess
 y0_guess = [state0; lambda0];
 y1p_guess = [state1_guess; lambda1p_guess];
 y2p_guess = [state2_guess; lambda2p_guess];
 
 % Arc1: off
-[t01, y01] = ode45(@odefun_off, [t0, t1], y0_guess);
+[t01, y01] = ode45(@odefun_off, [t0, t1], y0_guess, options);
 y1m = y01(end, :)';
 lambda1m = y1m(7:12);
 
-% Arc1: on
-[t12, y12] = ode45(@odefun_on, [t1, t2], y1p_guess);
+% Arc1: onqqq
+[t12, y12] = ode45(@odefun_on, [t1, t2], y1p_guess, options);
 y2m = y12(end, :)';
+y1p = y12(1, :)';
 lambda2m = y2m(7:12);
 
 % Arc3: off
-[t2f, y2f] = ode45(@odefun_off, [t2, tf], y2p_guess);
+[t2f, y2f] = ode45(@odefun_off, [t2, tf], y2p_guess, options);
+y2p = y2f(1, :)';
 yf = y2f(end, :)';
+tSolve = toc;
 
-%---------------------------- Residuals -----------------------------%
+
+%-------------------------------------------------------------------%
+%--------------------------- Residuals -----------------------------%
+%-------------------------------------------------------------------%
 % Res1: final state
 res1 = yf(1:6) - statef;
 
 % Res2: joint points jump and state continuity - t1
-r = y1p_guess(1:3);
-v = y1p_guess(4:6);
-lambda13m = y1m(7:9);
-lambda46m = y1m(10:12);
-lambda13p = y1p_guess(7:9);
-lambda46p = y1p_guess(10:12);
-mu1p = 1 / (2 * rho^2) * (r' * lambda46p - v' * v ...
-                        - r' * M1 * r - r' * M2 * v);
-res2 = [y1p_guess(1:6) - y1m(1:6); 
-        lambda13p - lambda13m - mu1p * r;
-        lambda46p - lambda46m];
+res2 = [y1p(1:6)-y1m(1:6); y1p(10:12)-y1m(10:12)];
 
 % Res3: joint points jump and state continuity - t2
-r = y2p_guess(1:3);
-v = y2p_guess(4:6);
-lambda13m = y2m(7:9);
-lambda46m = y2m(10:12);
-lambda13p = y2p_guess(7:9);
-lambda46p = y2p_guess(10:12);
-mu2p = 1 / (2 * rho^2) * (r' * lambda46m - v' * v ...
-                        - r' * M1 * r - r' * M2 * v);
-res3 = [y2p_guess(1:6) - y2m(1:6); 
-        lambda13p + mu2p * r - lambda13m;
-        lambda46p - lambda46m];
+res3 = [y2p(1:6)-y2m(1:6); y2p(10:12)-y2m(10:12)];
 
-% Final residual
-res = [res1; res2; res3];
+% Res4: tangent condition
+res4 = [dot(r1guess, v1guess); dot(r2guess, v2guess)];
 
 
-
-%%
+%-------------------------------------------------------------------%
+%--------------------------- Save Data -----------------------------%
+%-------------------------------------------------------------------%
 t = [t01; t12; t2f];
-x = [y01(:,1);y12(:,1);y2f(:,1)];
-y = [y01(:,2);y12(:,2);y2f(:,2)];
-z = [y01(:,3);y12(:,3);y2f(:,3)];
+x = [y01(:,1); y12(:,1); y2f(:,1)];
+y = [y01(:,2); y12(:,2); y2f(:,2)];
+z = [y01(:,3); y12(:,3); y2f(:,3)];
 r = sqrt(x.^2 + y.^2 + z.^2);
-u = -[y01(:, 10:12)', y12(:, 10:12)', y2f(:, 10:12)'];
-costate = [y01(:, 7:12)', y12(:, 7:12)', y2f(:, 7:12)'];
-unorm = vecnorm(u);
-dJ = 0.5*unorm.^2;
-J = trapz(t, dJ);
 
-figure
-plot(t, r);
-title('State')
+costate = [y01(:,7:12)', y12(:,7:12)', y2f(:,7:12)'];
+lambda = costate;
 
-figure
-plot(t, costate(1,:), 'LineWidth', 1.5);hold on
-plot(t, costate(2,:), 'LineWidth', 1.5);hold on
-plot(t, costate(3,:), 'LineWidth', 1.5);hold on
-plot(t, costate(4,:), 'LineWidth', 1.5);hold on
-plot(t, costate(5,:), 'LineWidth', 1.5);hold on
-plot(t, costate(6,:), 'LineWidth', 1.5);hold on
-legend('costate1', 'costate2', 'costate3', 'costate4', ...
-       'costate5', 'costate6')
-title('Costate')
+u01 = -y01(:, 10:12)';
+u12 = -y12(:, 10:12)';
+u2f = -y2f(:, 10:12)';
+u1 = [u01(1,:), u12(1,:), u2f(1,:)]';
+u2 = [u01(2,:), u12(2,:), u2f(2,:)]';
+u3 = [u01(3,:), u12(3,:), u2f(3,:)]';
+u01norm = vecnorm(u01);
+u12norm = vecnorm(u12);
+u2fnorm = vecnorm(u2f);
+u = [u01norm, u12norm, u2fnorm]';
 
-figure
-plot(t, u(1,:), 'LineWidth', 1.5);hold on
-plot(t, u(2,:), 'LineWidth', 1.5);hold on
-plot(t, u(3,:), 'LineWidth', 1.5);hold on
-legend('control1', 'control2', 'control3')
-title('Control')
+dJ01 = 0.5*u01norm.^2;
+dJ12 = 0.5*u12norm.^2;
+dJ2f = 0.5*u2fnorm.^2;
+J = trapz(t01, dJ01) + trapz(t12, dJ12) + trapz(t2f, dJ2f);
 
-figure
-plot(t, unorm);hold on
-title('UNorm')
+%% Lagrange multiplier
+lambda13 = lambda(1:3, :);
+lambda46 = lambda(4:6, :);
+state = [y01(:,1:6)', y12(:,1:6)', y2f(:,1:6)'];
+mu = zeros(length(r), 1);
+eta = zeros(length(r), 1);
+for i=1:length(r)
+    if i > size(y01, 1) && i <= size(y01,1) + size(y12,1)
+        eta(i) = 1/(2*rho^2) * (2*state(4:6, i)'*M2*lambda46(:, i) ...
+                   - 4*state(4:6, i)'*lambda13(:, i) ...
+                   - 3*(lambda46(:, i)'*lambda46(:, i)) ...
+                   + 8*state(1:3, i)'*M1*lambda46(:, i) ...
+                   + 2*state(1:3, i)'*M2*M2*lambda46(:, i) ...
+                   - 2*state(1:3, i)'*M2*lambda13(:, i) ...
+                   -4*state(1:3, i)'*M1*state(1:3, i) ...
+                   - 4*state(1:3, i)'*M1*M1*state(1:3, i) ...
+                   - 3*state(1:3, i)'*M1*M2*state(4:6, i) ...
+                   - state(1:3, i)'*M2*M1*state(4:6, i));
+    else
+        eta(i) = 0;
+    end
+    mu(i) = 1 / (2 * rho^2) * (state0(1:3, i)' * lambda46(:, i) ...
+                - state(4:6, i)' * state(4:6, i) ...
+                - state(1:3, i)' * M1 * state(1:3, i) ...
+                - state(1:3, i)' * M2 * state(4:6, i));
+end
+
+save data\indirect_ineq_data.mat rho0 rho x y z ...
+                                 u1 u2 u3 r u tSolve ...
+                                 lambda t J mu eta
 
 
 

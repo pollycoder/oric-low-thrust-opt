@@ -14,6 +14,7 @@ clc;clear
 % GPOPS-II Data
 path_gpops = "data/gpops_eq_data.mat";
 load(path_gpops);
+J_gpops = J;
 x_gpops = x;
 y_gpops = y;
 z_gpops = z;
@@ -28,6 +29,7 @@ tSolve_gpops = tSolve;
 % Indirect - Lagrange Multiplier Data
 path_lag = "data/indirect_eq_data.mat";
 load(path_lag);
+J_lag = J;
 x_lag = x;
 y_lag = y;
 z_lag = z;
@@ -57,11 +59,11 @@ res_lag = min(r_lag) - rho_ineq;
 %------------------------------- State -----------------------------%
 f=figure;
 plot(t_lag, r_lag, 'LineWidth', 1.5);hold on
-plot(t_gpops, r_gpops, 'LineWidth', 1.5);
+plot(t_gpops, r_gpops, 'LineWidth', 1.5, 'LineStyle', '--');
 legend('Indirect Method', 'GPOPS-II');
 title('State - pos');
 axis equal
-saveas(f, 'fig/state','fig');
+saveas(f, 'fig/state_eq','fig');
 
 %------------------------------ Costate ----------------------------%
 costate = lambda;
@@ -72,49 +74,45 @@ plot(t, costate(3, :), 'LineWidth', 1.5);hold on
 plot(t, costate(4, :), 'LineWidth', 1.5);hold on
 plot(t, costate(5, :), 'LineWidth', 1.5);hold on
 plot(t, costate(6, :), 'LineWidth', 1.5);
-legend('costate1', 'costate2', 'costate3', 'costate4', 'costate5', 'costate6');
+legend('costate1', 'costate2', 'costate3', ...
+       'costate4', 'costate5', 'costate6');
 title('Indirect Method - Costate');
-saveas(f, 'fig/costate','fig');
+saveas(f, 'fig/costate_eq','fig');
 
 
 %------------------------------ Control ----------------------------%
 f=figure;
-plot(t_lag, u1_lag, 'LineWidth', 1.5, ...
-    'LineStyle', '-', 'Color', "#A2142F");hold on
-plot(t_lag, u2_lag, 'LineWidth', 1.5, ...
-    'LineStyle', '-', 'Color', "#0072BD");hold on
-plot(t_lag, u3_lag, 'LineWidth', 1.5, ...
-    'LineStyle', '-', 'Color', "#EDB120");hold on
-plot(t_gpops, u1_gpops, 'LineWidth', 1.5, ...
-    'LineStyle', '--', 'Color', "#A2142F");hold on
-plot(t_gpops, u2_gpops, 'LineWidth', 1.5, ...
-    'LineStyle', '--', 'Color', "#0072BD");hold on
-plot(t_gpops, u3_gpops, 'LineWidth', 1.5, ...
-    'LineStyle', '--', 'Color', "#EDB120");hold on
+plot(t_lag, u1_lag, 'LineWidth', 1.5, 'LineStyle', '-');hold on
+plot(t_lag, u2_lag, 'LineWidth', 1.5, 'LineStyle', '-');hold on
+plot(t_lag, u3_lag, 'LineWidth', 1.5, 'LineStyle', '-');hold on
+plot(t_gpops, u1_gpops, 'LineWidth', 1.5, 'LineStyle', '--');hold on
+plot(t_gpops, u2_gpops, 'LineWidth', 1.5, 'LineStyle', '--');hold on
+plot(t_gpops, u3_gpops, 'LineWidth', 1.5, 'LineStyle', '--');hold on
 legend('control1 - Indirect', 'control2 - Indirect', ...
        'control3 - Indirect', 'control1 - GPOPS-II', ...
        'control2 - GPOPS-II', 'control3 - GPOPS-II');
 title('Control');
-saveas(f, 'fig/control','fig');
+saveas(f, 'fig/control_eq','fig');
 
 %------------------------ Norm of Control --------------------------%
 f=figure;
-plot(t_lag, u_lag, 'LineWidth', 1.5, 'Color', "#0072BD");hold on
-plot(t_gpops, u_gpops, 'LineWidth', 1.5, 'Color', "#A2142F");hold on
+plot(t_lag, u_lag, 'LineWidth', 1.5);hold on
+plot(t_gpops, u_gpops, 'LineWidth', 1.5, 'LineStyle', '--');hold on
 legend('control - Indirect', 'control - GPOPS-II');
 title('Control - Norm');
-saveas(f, 'fig/controlNorm','fig');
+saveas(f, 'fig/controlNorm_eq','fig');
 
 %--------------------------- Multiplier ----------------------------%
 f=figure;
 plot(t, mu_lag, 'LineWidth', 1.5);
 title('mu');
-saveas(f, 'fig/mu','fig');
+saveas(f, 'fig/mu_eq','fig');
 
 %--------------------------- Trajectory ----------------------------%
 f=figure;  
-plot3(x_lag, y_lag, z_lag, 'LineWidth', 1.5, 'Color', "#A2142F");hold on
-plot3(x_gpops, y_gpops, z_gpops, 'LineWidth', 1.5, 'Color', "#0072BD");hold on
+plot3(x_lag, y_lag, z_lag, 'LineWidth', 1.5);hold on
+plot3(x_gpops, y_gpops, z_gpops, ...
+      'LineWidth', 1.5, 'LineStyle', '--');hold on
 
 plot3(0, 0, 0, 'k*', 'LineWidth', 3);hold on
 text(0, 0, 0, 'Chief');hold on
@@ -135,4 +133,4 @@ axis equal
 
 legend('Indirect', 'GPOPS-II');
 title('Trajectory');
-saveas(f, 'fig/trajectory','fig');
+saveas(f, 'fig/trajectory_eq','fig');

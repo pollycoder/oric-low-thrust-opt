@@ -7,7 +7,7 @@ function [c, ceq] = nonlcon(X)
 %-------------------------------------------------------------------%
 %---------------------------- Constant -----------------------------%
 %-------------------------------------------------------------------%
-rho = 8; 
+rho = 9; 
 rho0 = 10;
 theta0 = pi; thetaf = theta0 + pi/2;
 t0 = 0; tf = 0.25;
@@ -76,9 +76,11 @@ y1m = y01(end, :)';
 % Arc1: on
 [~, y12] = ode45(@odefun_on, [t1, t2], y1p_guess);
 y2m = y12(end, :)';
+y1p = y12(1, :)';
 
 % Arc3: off
 [~, y2f] = ode45(@odefun_off, [t2, tf], y2p_guess);
+y2p = y2f(1, :)';
 yf = y2f(end, :)';
 
 %---------------------------- Residuals -----------------------------%
@@ -86,10 +88,10 @@ yf = y2f(end, :)';
 res1 = yf(1:6) - statef;
 
 % Res2: joint points jump and state continuity - t1
-res2 = y1p_guess(1:6) - y1m(1:6);
+res2 = [y1p(1:6)-y1m(1:6); y1p(10:12)-y1m(10:12)];
 
 % Res3: joint points jump and state continuity - t2
-res3 = y2p_guess(1:6) - y2m(1:6);
+res3 = [y2p(1:6)-y2m(1:6); y2p(10:12)-y2m(10:12)];
 
 % Res4: tangent condition
 res4 = [dot(r1guess, v1guess); dot(r2guess, v2guess)];
