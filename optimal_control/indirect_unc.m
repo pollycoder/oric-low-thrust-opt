@@ -1,15 +1,17 @@
-clc
-clear all
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Indirect method
-% LEO: omega = 4 rad/h
-% P3
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%-------------------------------------------------------------------%
+% Indirect method - Unconstrained Problem                           %
+% Main function                                                     %
+% LEO: omega = 4 rad/h                                              %
+% Reference: Woodford N T, Harris M W, Petersen C D. Spherically    %
+% constrained relative motion trajectories in low earth orbit[J].   %
+% Journal of Guidance, Control, and Dynamics, 2023, 46(4): 666-679. %  
+%-------------------------------------------------------------------%
+clc;clear
+
 tic
-global rho
+
 % Constant
 omega = 4;                                  % angular velocity, 4 rad/h
-%rho0 = 10;
 rho = 10;                                   % Distance between chief and deputy
 
 % Initial and final states
@@ -33,7 +35,7 @@ yguess = 10*ones(12, 1);
 solinit = bvpinit(tmesh, yguess);
 options = bvpset('Stats','on','RelTol',1e-9, 'Nmax', 100000);
 
-sol = bvp4c(@bvpfun, @bvpbc, solinit, options);
+sol = bvp4c(@bvpfun_unc, @bvpbc_unc, solinit, options);
 
 r = sol.y(1:3, :);
 v = sol.y(4:6, :);
@@ -107,45 +109,6 @@ text(x1(1), x2(1), x3(1), 'Departure');hold on
 plot3(x1(end), x2(end), x3(end), 'c*', 'LineWidth', 2);hold on
 text(x1(end), x2(end), x3(end), 'Arrival');hold on
 plot3(x1, x2, x3, 'k-', 'LineWidth', 1.5);hold on
-%quiver3(x1Index, x2Index, x3Index, uIndex(1, :), uIndex(2, :), uIndex(3, :), 0.3, 'Color', 'r','LineWidth', 1.5);
 title('Trajectory');
-%}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Control equations
-% f = dydt
-% y = [x; lambda], 12x1 vector
-% x: state - v and a, 6x1 vector
-% lambda: costate, 6x1 vector
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function dydt = bvpfun(t, y)
-global rho
-dydt = zeros(12, 1);
-% Constant
-omega = 4;                                  % angular velocity, 4 rad/h
 
-% Matrix
-M1 = diag([3 * omega^2, 0, -omega^2]);
-M2 = diag([2 * omega, 0], 1) + diag([-2 * omega, 0], -1);
-
-% Lagrange multiplier
-r = y(1:3);
-v = y(4:6);
-lambda13 = y(7:9);
-lambda46 = y(10:12);
-mu = 0;
-
-dydt(1:3) = v;
-dydt(4:6) = M1 * y(1:3) + M2 * v + 2 * mu * r - lambda46;
-dydt(7:9) = (4 * mu) * M1 * r - M1 * lambda46 - (2 * mu) * M2 * v + (4 * mu^2) * r - (2 * mu) * lambda46;
-dydt(10:12) = M2 * lambda46 - lambda13;
-end
-
-% Boundary conditions
-function res = bvpbc(y0, yf)
-global rho
-% Initial and final states
-x0 = [-rho; 0; 0; 0; 0; pi];
-xf = [0; -rho; 0; 0; 0; pi];
-res = [y0(1:6) - x0; yf(1:6) - xf];
-end
