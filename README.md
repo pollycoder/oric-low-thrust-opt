@@ -10,7 +10,13 @@ Link: [Google Drive](https://drive.google.com/drive/folders/11dhq9o1FhF6VWmS1nCk
 
 Requirements: [GPOPS-II](https://www.gpops2.com/) (Only necessary when you run the code under `/gpops`)
 
-This is a software solving optimal control problem developed by NASA. If you do not have one, you can download it from the link above. 
+This is a software solving optimal control problem with Gaussian pseudo-spectrum method developed by NASA. If you do not have one, you can download it from the link above. 
+
+Please cite GPOPS-II properly as follows:
+
+> Patterson, M. A. and Rao, A. V., "GPOPS-II: A MATLAB Software for Solving Multiple-Phase Optimal Control Problems Using hp-Adaptive Gaussian Quadrature Collocation Methods and Sparse Nonlinear Programming", *ACM Transactions on Mathematical Software*, Vol. 41, No. 1., October 2014, pp. 1:1 - 1:37.
+
+For details about citations, please go to [LINCENCE](https://www.gpops2.com/License.html).
 
 **Attention: GPOPS-II could only work on computers with x86 or x64 architecture !**
 
