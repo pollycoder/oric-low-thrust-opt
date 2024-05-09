@@ -1,15 +1,18 @@
 %-------------------------------------------------------------------%
 % Indirect method  - Interior point constraint  (2 points)          %
-% Objective Function - Residual                                     %
+% Objective Function                                                %
+%-------------------------------------------------------------------%
 % Reference: Woodford N T, Harris M W, Petersen C D. Spherically    %
 % constrained relative motion trajectories in low earth orbit[J].   %
 % Journal of Guidance, Control, and Dynamics, 2023, 46(4): 666-679. %  
 %-------------------------------------------------------------------%
 function J = obj_res(X)
-% "*_p" <==> "t+"
-% "*_m" <==> "t-"
-% X: dt1, dt2, lambda0(6), lambda1+(6), lambda2+(6), 
-%    theta1, phi1, theta2, phi2, v1(3), v2(3)
+%-------------------------------------------------------------------%
+% "*_p" <==> "t+"                                                   %
+% "*_m" <==> "t-"                                                   %
+% X: dt1, dt2, lambda0(6), lambda1+(6), lambda2+(6),                %
+%    theta1, phi1, theta2, phi2, v1(3), v2(3)                       %
+%-------------------------------------------------------------------%
 
 %-------------------------------------------------------------------%
 %---------------------------- Constant -----------------------------%

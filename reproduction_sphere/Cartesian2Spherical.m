@@ -1,21 +1,30 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Cartesian coordinates ---> Spherical coordinates
-% Cartesian states:
-%   CartesianState(1): x
-%   CartesianState(2): y
-%   CartesianState(3): z
-%   CartesianState(4): vx
-%   CartesianState(5): vy
-%   CartesianState(6): vz
-% Spherical states:
-%   SphericalState(1): rho
-%   SphericalState(2): theta
-%   SphericalState(3): phi
-%   SphericalState(4): vRho
-%   SphericalState(5): vTheta
-%   SphericalState(6): vPhi
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%-------------------------------------------------------------------%
+% Spherically constrained - CubicFitRot Reproduction                %
+% Cartesian coordinates ---> Spherical coordinates                  %
+%-------------------------------------------------------------------%
+% Reference: Woodford N T, Harris M W, Petersen C D. Spherically    %
+% constrained relative motion trajectories in low earth orbit[J].   %
+% Journal of Guidance, Control, and Dynamics, 2023, 46(4): 666-679. %                                                
+%-------------------------------------------------------------------%
 function [SphericalState6D] = Cartesian2Spherical(CartesianState, tol)
+%-------------------------------------------------------------------%
+% Cartesian states:                                                 %
+%   CartesianState(1): x                                            %
+%   CartesianState(2): y                                            %
+%   CartesianState(3): z                                            %
+%   CartesianState(4): vx                                           %
+%   CartesianState(5): vy                                           %
+%   CartesianState(6): vz                                           %
+%-------------------------------------------------------------------%
+% Spherical states:                                                 %
+%   SphericalState(1): rho                                          %
+%   SphericalState(2): theta                                        %
+%   SphericalState(3): phi                                          %
+%   SphericalState(4): vRho                                         %
+%   SphericalState(5): vTheta                                       %
+%   SphericalState(6): vPhi                                         %
+%-------------------------------------------------------------------%
+
 if nargin < 2
     tol = 1e-6;
 end

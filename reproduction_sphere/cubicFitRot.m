@@ -1,10 +1,31 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% CubicFitRot Interpolation
-% Optimize "CubicFit" algorithm by rotating the coordinates.
-% Input: new variable g - the number of search angles
-% Output: T - the rotating matrix
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [TStar, uStar, sStar, JStar, rho] = cubicFitRot(CartesianState0, CartesianStatef, t0, tf, M1, M2, g, tol)
+%-------------------------------------------------------------------%
+% Spherically constrained - CubicFitRot Reproduction                %
+% CubicFitRot Algorithm                                             %
+%-------------------------------------------------------------------%
+% Reference: Woodford N T, Harris M W, Petersen C D. Spherically    %
+% constrained relative motion trajectories in low earth orbit[J].   %
+% Journal of Guidance, Control, and Dynamics, 2023, 46(4): 666-679. %                                                
+%-------------------------------------------------------------------%
+function [TStar, uStar, sStar, JStar, rho] = cubicFitRot(CartesianState0, ...
+                                                         CartesianStatef, ...
+                                                         t0, tf, M1, M2, g, tol)
+%-------------------------------------------------------------------%
+% Input:                                                            %
+%   s0: Initial state - theta0, phi0, d(theta)/dt(0), d(phi)/dt(0)  %
+%   sf: Final state - thetaf, phif, d(theta)/dt(f), d(phi)/dt(f)    %
+%   t0: Initial time                                                %
+%   tf: Final time                                                  %
+%   M1,M2: C-W matrix                                               %
+%   rho: radial length                                              %
+%   g - the number of search angles                                 %
+%-------------------------------------------------------------------%
+% Output:                                                           %
+%   J: Optimizing index                                             %
+%   u: controlled variable                                          %
+%   state: theta, phi, d(theta)/dt, d(phi)/dt                       %
+%   T - the rotating matrix                                         %
+%-------------------------------------------------------------------%
+
 if nargin < 8
     tol = 1e-3;
 end
@@ -22,7 +43,6 @@ sStar = zeros(6, 1);
 
 for i=1:g
     for j=1:g
-        %fprintf("Iteration: %d\n", i*j);
         % Matrix T
         alpha1 = ang(i);
         alpha2 = ang(j);

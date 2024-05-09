@@ -1,6 +1,7 @@
 %-------------------------------------------------------------------%
 % Indirect method - Equality Constraint                             %
 % LEO: omega = 4 rad/h                                              %
+%-------------------------------------------------------------------%
 % Reference: Woodford N T, Harris M W, Petersen C D. Spherically    %
 % constrained relative motion trajectories in low earth orbit[J].   %
 % Journal of Guidance, Control, and Dynamics, 2023, 46(4): 666-679. %  
@@ -10,8 +11,8 @@ clc;clear
 %-------------------------------------------------------------------%
 %---------------------------- Constant -----------------------------%
 %-------------------------------------------------------------------%
-omega = 4;                                   % angular velocity, 4 rad/h
-rho0 = 10;                                   % Distance between chief and deputy
+omega = 4;      % angular velocity, 4 rad/h
+rho0 = 10;      % Distance between chief and deputy
 rho = 10;
 
 % Initial and final states
@@ -60,8 +61,9 @@ tol = 1e-5;
 for i=1:size(r, 2)
     C = norm(r);
     mu(i) = 1 / (2 * rho^2) * (r(:, i)' * lambda46(:, i) ...
-                - v(:, i)' * v(:, i) - r(:, i)' * M1 * r(:, i) ...
-                - r(:, i)' * M2 * v(:, i));
+                             - v(:, i)' * v(:, i) ...
+                             - r(:, i)' * M1 * r(:, i) ...
+                             - r(:, i)' * M2 * v(:, i));
 end
 
 % Integration
@@ -85,5 +87,7 @@ u2 = u(2,:);
 u3 = u(3,:);
 u = sqrt(u1.^2 + u2.^2 + u3.^2);
 
-save data\indirect_eq_data.mat rho0 rho x y z u1 u2 u3 r u mu tSolve lambda t J
+save data\indirect_eq_data.mat rho0 rho x y z ...
+                               u1 u2 u3 r u mu ...
+                               tSolve lambda t J
 

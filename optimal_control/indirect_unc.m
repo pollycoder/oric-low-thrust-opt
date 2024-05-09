@@ -2,6 +2,7 @@
 % Indirect method - Unconstrained Problem                           %
 % Main function                                                     %
 % LEO: omega = 4 rad/h                                              %
+%-------------------------------------------------------------------%
 % Reference: Woodford N T, Harris M W, Petersen C D. Spherically    %
 % constrained relative motion trajectories in low earth orbit[J].   %
 % Journal of Guidance, Control, and Dynamics, 2023, 46(4): 666-679. %  
@@ -57,14 +58,14 @@ J = trapz(t, dJ);
 fprintf('J = %f', J);
 tSolve = toc;
 
-%% State - radius
+% State - radius
 x1 = sol.y(1, :);
 x2 = sol.y(2, :);
 x3 = sol.y(3, :);
 x = sqrt(x1.^2 + x2.^2 + x3.^2);
 x = x - rho * ones(size(x));
 
-%% Plot
+% Plot
 figure
 set(gca, 'XTick', 9:0.5:11);
 plot(t, x, 'LineWidth', 1.5);

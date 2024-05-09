@@ -1,6 +1,11 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% 5-points Gauss-Legendre Integration
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%-------------------------------------------------------------------%
+% Spherically constrained - CubicFitRot Reproduction                %
+% 5-point Gauss-Legendre integration                                %
+%-------------------------------------------------------------------%
+% Reference: Woodford N T, Harris M W, Petersen C D. Spherically    %
+% constrained relative motion trajectories in low earth orbit[J].   %
+% Journal of Guidance, Control, and Dynamics, 2023, 46(4): 666-679. %                                                
+%-------------------------------------------------------------------%
 function result=gaussLegendre5_comp(f,a,b,n)
 result=0;
 dx=linspace(a,b,n+1);

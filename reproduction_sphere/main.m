@@ -1,14 +1,13 @@
 %-------------------------------------------------------------------%
-% Reproduction of spherically-constrained optimal control           %
-% Paper resource:                                                   %
-%   Woodford, N. T., Harris, M. W., & Petersen, C. D. (2023).       %
-% Spherically constrained relative motion trajectories in           %
-% low earth orbit. Journal of Guidance, Control, and Dynamics,      %
-% 46(4), 666-679.                                                   %
+% Spherically constrained - CubicFitRot Reproduction                %
+% Main function                                                     %
 %-------------------------------------------------------------------%
-clc;clear
+% Reference: Woodford N T, Harris M W, Petersen C D. Spherically    %
+% constrained relative motion trajectories in low earth orbit[J].   %
+% Journal of Guidance, Control, and Dynamics, 2023, 46(4): 666-679. %                                                
+%-------------------------------------------------------------------%
+clc;clear; tic
 
-tic
 %-------------------------------------------------------------------%
 %---------------------------- Constant -----------------------------%
 %-------------------------------------------------------------------%
@@ -63,7 +62,8 @@ r = rho;
 X2 = X * r;
 Y2 = Y * r;
 Z2 = Z * r;
-surf(X2, Y2, Z2,  'FaceAlpha', 0.2, 'EdgeColor', 'texturemap'); hold on
+surf(X2, Y2, Z2,  'FaceAlpha', 0.2, 'EdgeColor', ...
+    'texturemap'); hold on
 colormap(gca, 'bone')
 axis equal
 

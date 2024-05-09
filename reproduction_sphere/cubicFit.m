@@ -1,19 +1,29 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Cubic-fit interpolation
-% Interpolate the states and controlled variable
-% Input: 
-%   s0: Initial state - theta0, phi0, d(theta)/dt(0), d(phi)/dt(0)
-%   sf: Final state - thetaf, phif, d(theta)/dt(f), d(phi)/dt(f)
-%   t0: Initial time
-%   tf: Final time
-%   M1,M2: C-W matrix
-%   rho: radial length
-% Output:
-%   J: Optimizing index
-%   u: controlled variable
-%   state: theta, phi, d(theta)/dt, d(phi)/dt
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [J,u,SphericalState4D] = cubicFit(SphericalState4D0, SphericalState4Df, t0, tf, M1, M2, rho)
+%-------------------------------------------------------------------%
+% Spherically constrained - CubicFitRot Reproduction                %
+% CubicFit Algorithm                                                %
+%-------------------------------------------------------------------%
+% Reference: Woodford N T, Harris M W, Petersen C D. Spherically    %
+% constrained relative motion trajectories in low earth orbit[J].   %
+% Journal of Guidance, Control, and Dynamics, 2023, 46(4): 666-679. %                                                
+%-------------------------------------------------------------------%
+function [J,u,SphericalState4D] = cubicFit(SphericalState4D0, ...
+                                           SphericalState4Df, ...
+                                           t0, tf, M1, M2, rho)
+%-------------------------------------------------------------------%
+% Input:                                                            %
+%   s0: Initial state - theta0, phi0, d(theta)/dt(0), d(phi)/dt(0)  %
+%   sf: Final state - thetaf, phif, d(theta)/dt(f), d(phi)/dt(f)    %
+%   t0: Initial time                                                %
+%   tf: Final time                                                  %
+%   M1,M2: C-W matrix                                               %
+%   rho: radial length                                              %
+%-------------------------------------------------------------------%
+% Output:                                                           %
+%   J: Optimizing index                                             %
+%   u: controlled variable                                          %
+%   state: theta, phi, d(theta)/dt, d(phi)/dt                       %
+%-------------------------------------------------------------------%
+
 % F Matrix
 F = [1, t0, t0^2, t0^3;
      0, 1,  2*t0, 3*t0^2;
@@ -66,12 +76,12 @@ cPhi = cos(SphericalState4D(2));
 % Cartesian position and velocity
 p = rho .* [cTheta .* sPhi;
             sTheta .* sPhi;
-            cPhi];                          % Position
-v = rho .* [-vTheta .* sTheta .* sPhi + vPhi .* cTheta .* cPhi;             % Velocity
+            cPhi];                         
+v = rho .* [-vTheta .* sTheta .* sPhi + vPhi .* cTheta .* cPhi;             
             vTheta .* cTheta .* sPhi + vPhi .* sTheta .* cPhi;   
             -vPhi .* sPhi];
 
-a = rho .* [-aTheta .* sTheta .* sPhi - vTheta.^2 .* cTheta .* sPhi ...     % Acceleration
+a = rho .* [-aTheta .* sTheta .* sPhi - vTheta.^2 .* cTheta .* sPhi ...     
            - 2 .* vTheta .* vPhi .* sTheta .* cPhi + aPhi .* cTheta .* cPhi ...
            - vTheta.^2 .* cTheta .* sPhi,...
             aTheta .* cTheta .* sPhi - vTheta.^2 .* sTheta .* sPhi ...
