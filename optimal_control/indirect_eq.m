@@ -1,6 +1,6 @@
 %-------------------------------------------------------------------%
-% Indirect method - Equality Constraint                             %
-% LEO: omega = 4 rad/h                                              %
+% Spherically constraint - Indirect (Pontryagin)                    %
+% Main Function                                                     %
 %-------------------------------------------------------------------%
 % Reference: Woodford N T, Harris M W, Petersen C D. Spherically    %
 % constrained relative motion trajectories in low earth orbit[J].   %
@@ -11,25 +11,14 @@ clc;clear
 %-------------------------------------------------------------------%
 %---------------------------- Constant -----------------------------%
 %-------------------------------------------------------------------%
-omega = 4;      % angular velocity, 4 rad/h
-rho0 = 10;      % Distance between chief and deputy
-rho = 10;
-
-% Initial and final states
-theta0 = pi;
-thetaf = theta0 + pi / 2;
-x0 = [rho0 * cos(theta0); rho0 * sin(theta0); 0; 0; 0; pi];
-xf = [rho0 * cos(thetaf); rho0 * sin(thetaf); 0; 0; 0; pi];
+rho = 10; 
+rho0 = 10; omega = 4;
+M1 = diag([3 * omega^2, 0, -omega^2]);
+M2 = diag([2 * omega, 0], 1) + diag([-2 * omega, 0], -1);
 
 % Time
 t0 = 0;
 tf = 0.25;
-
-% Matrix
-M1 = diag([3 * omega^2, 0, -omega^2]);
-M2 = diag([2 * omega, 0], 1) + diag([-2 * omega, 0], -1);
-A = [zeros(3), eye(3); M1, M2];
-B = [zeros(3); eye(3)];
 
 
 %-------------------------------------------------------------------%
@@ -66,7 +55,7 @@ for i=1:size(r, 2)
                              - r(:, i)' * M2 * v(:, i));
 end
 
-% Integration
+% Integral
 for i=1:size(r, 2)
     u(:, i) = 2 * mu(i) * r(:, i) - lambda46(:, i);
 end

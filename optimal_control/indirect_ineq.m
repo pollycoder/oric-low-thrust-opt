@@ -1,6 +1,6 @@
 %-------------------------------------------------------------------%
-% Indirect method  - Interior point constraint  (2 points)          %
-% LEO: omega = 4 rad/h                                              %
+% Spherically Inequality Constraint - Indirect (Pontryagin)         %
+% Main Function                                                     %
 %-------------------------------------------------------------------%
 % Reference: Woodford N T, Harris M W, Petersen C D. Spherically    %
 % constrained relative motion trajectories in low earth orbit[J].   %
@@ -82,7 +82,7 @@ options = optimoptions("fmincon", ...
                        "UseParallel",true, ...
                        "MaxFunctionEvaluations", 5e5, ...
                        "StepTolerance", 1e-15);
-[X, J] = fmincon(@obj_res, X0, A, b, [],[],[],[], @nonlcon,options);
+[X, J] = fmincon(@obj_func, X0, A, b, [],[],[],[], @nonlcon,options);
 
 
 %-------------------------------------------------------------------%
@@ -223,7 +223,7 @@ for i=1:length(r)
     else
         eta(i) = 0;
     end
-    mu(i) = 1 / (2 * rho^2) * (state0(1:3, i)' * lambda46(:, i) ...
+    mu(i) = 1 / (2 * rho^2) * (state(1:3, i)' * lambda46(:, i) ...
                 - state(4:6, i)' * state(4:6, i) ...
                 - state(1:3, i)' * M1 * state(1:3, i) ...
                 - state(1:3, i)' * M2 * state(4:6, i));

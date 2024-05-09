@@ -1,6 +1,6 @@
 %-------------------------------------------------------------------%
-% Indirect method  - Interior point constraint  (2 points)          %
-% Objective Function                                                %
+% Spherically Inequality Constraint - Indirect (Pontryagin)         %
+% Non-linear Constraint for fmincon                                 %
 %-------------------------------------------------------------------%
 % Reference: Woodford N T, Harris M W, Petersen C D. Spherically    %
 % constrained relative motion trajectories in low earth orbit[J].   %
@@ -115,7 +115,6 @@ rbase = rho .* ones(size(r));
 
 % Final residual
 ceq = [res1; res2; res3; res4];
-
 c = max(rbase - r);
 
 end

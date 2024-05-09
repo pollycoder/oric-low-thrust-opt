@@ -1,12 +1,12 @@
 %-------------------------------------------------------------------%
-% Indirect method  - Interior point constraint  (2 points)          %
+% Spherically Inequality Constraint - Indirect (Pontryagin)         %
 % Objective Function                                                %
 %-------------------------------------------------------------------%
 % Reference: Woodford N T, Harris M W, Petersen C D. Spherically    %
 % constrained relative motion trajectories in low earth orbit[J].   %
 % Journal of Guidance, Control, and Dynamics, 2023, 46(4): 666-679. %  
 %-------------------------------------------------------------------%
-function J = obj_res(X)
+function J = obj_func(X)
 %-------------------------------------------------------------------%
 % "*_p" <==> "t+"                                                   %
 % "*_m" <==> "t-"                                                   %

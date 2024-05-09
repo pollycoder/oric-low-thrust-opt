@@ -1,35 +1,31 @@
 %-------------------------------------------------------------------%
-% Unconstrained - Indirect (Pontryagin)                             %
-% Main function                                                     %
-% LEO: omega = 4 rad/h                                              %
+% Spherically constraint - Indirect (Penalty)                       %
+% Main Function                                                     %
 %-------------------------------------------------------------------%
 % Reference: Woodford N T, Harris M W, Petersen C D. Spherically    %
 % constrained relative motion trajectories in low earth orbit[J].   %
 % Journal of Guidance, Control, and Dynamics, 2023, 46(4): 666-679. %  
 %-------------------------------------------------------------------%
-clc;clear
+clc;clear;
 
 %-------------------------------------------------------------------%
-%--------------------------- Constant ------------------------------%
+%---------------------------- Constant -----------------------------%
 %-------------------------------------------------------------------%
-omega = 4;                                  
-rho = 10;                                   
-x0 = [-rho; 0; 0; 0; 0; pi];
-xf = [0; -rho; 0; 0; 0; pi];
+rho = 10;                                   % Distance between chief and deputy
 t0 = 0; tf = 0.25;
 
 
 %-------------------------------------------------------------------%
-%------------------------ Mesh and Guess ---------------------------%
+%------------------------ Guess and Mesh ---------------------------%
 %-------------------------------------------------------------------%
-n = 1e3;
+n = 50;
 tmesh = linspace(t0, tf, n);
-yguess = 10*ones(12, 1);
+yguess = [8.521; -4.894; -1.854; -5.529; -8.154; -3.385; ones(6, 1)];
 solinit = bvpinit(tmesh, yguess);
-options = bvpset('Stats','on','RelTol',1e-9, 'Nmax', 100000);
+options = bvpset('Stats','on','RelTol',1e-5, 'Nmax', 100000);
 
 tic
-sol = bvp4c(@bvpfun_unc, @bvpbc_unc, solinit, options);
+sol = bvp4c(@bvpfun_eq_penalty, @bvpbc_eq, solinit, options);
 tSolve = toc;
 
 
@@ -65,7 +61,6 @@ u2 = u(2,:);
 u3 = u(3,:);
 u = sqrt(u1.^2 + u2.^2 + u3.^2);
 
-save data\indirect_unc_data.mat rho x y z ...
+save data\indirect_eq_penalty_data.mat rho0 rho x y z ...
                                u1 u2 u3 r u ...
                                tSolve lambda t J
-

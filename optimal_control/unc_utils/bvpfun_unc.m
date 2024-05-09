@@ -1,7 +1,6 @@
 %-------------------------------------------------------------------%
-% Indirect method - Unconstrained Problem                           %
-% Boundary Conditions                                               %
-% LEO: omega = 4 rad/h                                              %
+% Unconstrained - Indirect (Pontryagin)                             %
+% Dynamics Equations                                                %
 %-------------------------------------------------------------------%
 % Reference: Woodford N T, Harris M W, Petersen C D. Spherically    %
 % constrained relative motion trajectories in low earth orbit[J].   %
