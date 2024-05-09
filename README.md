@@ -16,7 +16,7 @@ Please cite GPOPS-II properly as follows:
 
 > Patterson, M. A. and Rao, A. V., "GPOPS-II: A MATLAB Software for Solving Multiple-Phase Optimal Control Problems Using hp-Adaptive Gaussian Quadrature Collocation Methods and Sparse Nonlinear Programming", *ACM Transactions on Mathematical Software*, Vol. 41, No. 1., October 2014, pp. 1:1 - 1:37.
 
-For details about citations, please go to [LINCENCE](https://www.gpops2.com/License.html).
+For details about citations, please go to [LICENCE](https://www.gpops2.com/License.html).
 
 **Attention: GPOPS-II could only work on computers with x86 or x64 architecture !**
 
