@@ -68,17 +68,21 @@ title('State - pos');
 saveas(f, 'fig/state_ineq','fig');
 
 %------------------------------ Costate ----------------------------%
-costate = lambda;
 f=figure;
+costate = lambda_lag;
+subplot(1, 2, 1)
 plot(t, costate(1, :), 'LineWidth', 1.5);hold on
 plot(t, costate(2, :), 'LineWidth', 1.5);hold on
 plot(t, costate(3, :), 'LineWidth', 1.5);hold on
+legend('\lambda_1', '\lambda_2', '\lambda_3');
+title('\lambda_1 ~ \lambda_3')
+
+subplot(1, 2, 2)
 plot(t, costate(4, :), 'LineWidth', 1.5);hold on
 plot(t, costate(5, :), 'LineWidth', 1.5);hold on
 plot(t, costate(6, :), 'LineWidth', 1.5);
-legend('costate1', 'costate2', 'costate3', ...
-       'costate4', 'costate5', 'costate6');
-title('Indirect Method - Costate');
+legend('\lambda_4', '\lambda_5', '\lambda_6');
+title('\lambda_4 ~ \lambda_6');
 saveas(f, 'fig/costate_ineq','fig');
 
 
@@ -90,8 +94,8 @@ plot(t_lag, u3_lag, 'LineWidth', 1.5, 'LineStyle', '-');hold on
 plot(t_gpops, u1_gpops, 'LineWidth', 1.5, 'LineStyle', '--');hold on
 plot(t_gpops, u2_gpops, 'LineWidth', 1.5, 'LineStyle', '--');hold on
 plot(t_gpops, u3_gpops, 'LineWidth', 1.5, 'LineStyle', '--');hold on
-legend('control1 - Indirect', 'control2 - Indirect', ...
-       'control3 - Indirect', 'control1 - GPOPS-II', ...
+legend('control1 - Pontryagin', 'control2 - Pontryagin', ...
+       'control3 - Pontryagin', 'control1 - GPOPS-II', ...
        'control2 - GPOPS-II', 'control3 - GPOPS-II');
 title('Control');
 saveas(f, 'fig/control_ineq','fig');

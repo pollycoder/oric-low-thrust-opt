@@ -77,43 +77,68 @@ res_lag = min(r_lag) - rho_ineq;
 %------------------------------- State -----------------------------%
 f=figure;
 plot(t_lag, r_lag, 'LineWidth', 1.5);hold on
+plot(t_pen, r_pen, 'LineWidth', 1.5, 'LineStyle', '-.');hold on
 plot(t_gpops, r_gpops, 'LineWidth', 1.5, 'LineStyle', '--');
-legend('Indirect Method', 'GPOPS-II');
-title('State - pos');
-axis equal
+legend('Pontryagin', 'Penalty', 'GPOPS-II');
+title('State');
 saveas(f, 'fig/state_eq','fig');
 
 %------------------------------ Costate ----------------------------%
-costate = lambda;
 f=figure;
-plot(t, costate(1, :), 'LineWidth', 1.5);hold on
-plot(t, costate(2, :), 'LineWidth', 1.5);hold on
-plot(t, costate(3, :), 'LineWidth', 1.5);hold on
-plot(t, costate(4, :), 'LineWidth', 1.5);hold on
-plot(t, costate(5, :), 'LineWidth', 1.5);hold on
-plot(t, costate(6, :), 'LineWidth', 1.5);
-legend('costate1', 'costate2', 'costate3', ...
-       'costate4', 'costate5', 'costate6');
-title('Indirect Method - Costate');
+subplot(2, 3, 1)
+plot(t_lag, lambda_lag(1, :), 'LineWidth', 1.5, 'LineStyle', '-');hold on
+plot(t_pen, lambda_pen(1, :), 'LineWidth', 1.5, 'LineStyle', '-.');hold on
+legend('Pontryagin', 'Penalty')
+title('\lambda_1')
+
+subplot(2, 3, 2)
+plot(t_lag, lambda_lag(2, :), 'LineWidth', 1.5, 'LineStyle', '-');hold on
+plot(t_pen, lambda_pen(2, :), 'LineWidth', 1.5, 'LineStyle', '-.');hold on
+legend('Pontryagin', 'Penalty')
+title('\lambda_2')
+
+subplot(2, 3, 3)
+plot(t_lag, lambda_lag(3, :), 'LineWidth', 1.5, 'LineStyle', '-');hold on
+plot(t_pen, lambda_pen(3, :), 'LineWidth', 1.5, 'LineStyle', '-.');hold on
+legend('Pontryagin', 'Penalty')
+title('\lambda_3')
 saveas(f, 'fig/costate_eq','fig');
 
+subplot(2, 3, 4)
+plot(t_lag, lambda_lag(4, :), 'LineWidth', 1.5, 'LineStyle', '-');hold on
+plot(t_pen, lambda_pen(4, :), 'LineWidth', 1.5, 'LineStyle', '-.');hold on
+legend('Pontryagin', 'Penalty')
+title('\lambda_4')
+
+subplot(2, 3, 5)
+plot(t_lag, lambda_lag(5, :), 'LineWidth', 1.5, 'LineStyle', '-');hold on
+plot(t_pen, lambda_pen(5, :), 'LineWidth', 1.5, 'LineStyle', '-.');hold on
+legend('Pontryagin', 'Penalty')
+title('\lambda_5')
+
+subplot(2, 3, 6)
+plot(t_lag, lambda_lag(6, :), 'LineWidth', 1.5, 'LineStyle', '-');hold on
+plot(t_pen, lambda_pen(6, :), 'LineWidth', 1.5, 'LineStyle', '-.');hold on
+legend('Pontryagin', 'Penalty')
+title('\lambda_6')
+saveas(f, 'fig/costate_eq','fig');
 
 %------------------------------ Control ----------------------------%
 f=figure;
 plot(t_lag, u1_lag, 'LineWidth', 1.5, 'LineStyle', '-');hold on
 plot(t_lag, u2_lag, 'LineWidth', 1.5, 'LineStyle', '-');hold on
 plot(t_lag, u3_lag, 'LineWidth', 1.5, 'LineStyle', '-');hold on
-plot(t_lag, u1_pen, 'LineWidth', 1.5, 'LineStyle', '-.');hold on
-plot(t_lag, u2_pen, 'LineWidth', 1.5, 'LineStyle', '-.');hold on
-plot(t_lag, u3_pen, 'LineWidth', 1.5, 'LineStyle', '-.');hold on
+plot(t_pen, u1_pen, 'LineWidth', 1.5, 'LineStyle', '-.');hold on
+plot(t_pen, u2_pen, 'LineWidth', 1.5, 'LineStyle', '-.');hold on
+plot(t_pen, u3_pen, 'LineWidth', 1.5, 'LineStyle', '-.');hold on
 plot(t_gpops, u1_gpops, 'LineWidth', 1.5, 'LineStyle', '--');hold on
 plot(t_gpops, u2_gpops, 'LineWidth', 1.5, 'LineStyle', '--');hold on
 plot(t_gpops, u3_gpops, 'LineWidth', 1.5, 'LineStyle', '--');hold on
-legend('control1 - Indirect (Pontryagin)', ...
-       'control2 - Indirect (Pontryagin)', ...
-       'control3 - Indirect (Pontryagin)', ...
-       'control1 - Indirect (Penalty)', ...
-       'control2 - Indirect (Penalty)', ...
+legend('control1 - Pontryagin', ...
+       'control2 - Pontryagin', ...
+       'control3 - Pontryagin', ...
+       'control1 - Penalty', ...
+       'control2 - Penalty', ...
        'control3 - Indirect (Penalty)', ...
        'control1 - GPOPS-II', ...
        'control2 - GPOPS-II', ...
@@ -132,7 +157,7 @@ saveas(f, 'fig/controlNorm_eq','fig');
 
 %--------------------------- Multiplier ----------------------------%
 f=figure;
-plot(t, mu_lag, 'LineWidth', 1.5);
+plot(t_lag, mu_lag, 'LineWidth', 1.5);
 title('mu');
 saveas(f, 'fig/mu_eq','fig');
 
