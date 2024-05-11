@@ -9,7 +9,7 @@
 function dydt = bvpfun_eq_penalty(t, y)
 % Constant
 omega = 4;                                  % angular velocity, 4 rad/h
-alpha = 1e6;                                % Parameter to be adjusted
+alpha = 1e4;                                % Parameter to be adjusted
 rho = 10;                                   % Distance between chief and deputy
 
 % Matrix

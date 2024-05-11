@@ -34,9 +34,16 @@ index0 = 3; dimLambda = 6;
 index1 = index0 + dimLambda;
 index2 = index1 + dimLambda;
 index3 = index2 + dimLambda;
-lambda0 = X(index0:index1-1);
-lambda1p_guess = X(index1:index2-1);
-lambda2p_guess = X(index2:index3-1);
+
+lambda0 = zeros(dimLambda, 1);
+lambda1p_guess = zeros(dimLambda, 1);
+lambda2p_guess = zeros(dimLambda, 1);
+
+for i=1:dimLambda
+    lambda0(i) = X(index0+i-1);
+    lambda1p_guess(i) = X(index1+i-1);
+    lambda2p_guess(i) = X(index2+i-1);
+end
 
 
 %-------------------------------------------------------------------%
@@ -47,7 +54,6 @@ index4 = index3;
 index5 = index4 + dimSphere;
 index6 = index5 + dimSphere;
 index7 = index6 + dimV;
-index8 = index7 + dimV;
 
 % Spherical coordinate - angles guess
 theta1 = X(index4);
@@ -62,8 +68,13 @@ r1guess = [x1guess; y1guess; z1guess];
 r2guess = [x2guess; y2guess; z2guess];
 
 % Velocity guess
-v1guess = X(index6:index7-1);
-v2guess = X(index7:index8-1);
+v1guess = zeros(dimV, 1);
+v2guess = zeros(dimV, 1);
+
+for i=1:dimV
+    v1guess(i) = X(index6+i-1);
+    v2guess(i) = X(index7+i-1);
+end
 
 % State guess
 state1_guess = [r1guess; v1guess];
