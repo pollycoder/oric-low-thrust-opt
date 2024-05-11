@@ -44,7 +44,8 @@ t_lag = t;
 tSolve_lag = tSolve;
 lambda_lag = lambda;
 mu_lag = mu;
-eta_lag = eta;
+eta1_lag = eta1;
+eta2_lag = eta2;
 
 
 %-------------------------------------------------------------------%
@@ -108,18 +109,20 @@ legend('control - Indirect', 'control - GPOPS-II');
 title('Control - Norm');
 saveas(f, 'fig/controlNorm_ineq','fig');
 
-
+%%
 %--------------------------- Multiplier ----------------------------%
 f=figure;
 plot(t, mu_lag, 'LineWidth', 1.5);
 title('Multiplier \mu');
 saveas(f, 'fig/mu_ineq','fig');
-
+    
 f=figure;
-plot(t, eta_lag, 'LineWidth', 1.5);
+%plot(t, eta1_lag, 'LineWidth', 1.5);hold on
+plot(t, eta2_lag, 'LineWidth', 1.5);
+%legend('\eta1', '\eta2')
 title('Multiplier \eta');
 saveas(f, 'fig/eta_ineq','fig');
-
+%%
 %--------------------------- Trajectory ----------------------------%
 f=figure;  
 plot3(x_lag, y_lag, z_lag, 'LineWidth', 1.5);hold on

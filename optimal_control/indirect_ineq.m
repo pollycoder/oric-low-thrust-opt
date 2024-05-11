@@ -65,6 +65,27 @@ phi2 = -0.00374951776919052;
 X0 = [t1; t2-t1; lambda0;lambda1;lambda2; 
       theta1; phi1; theta2; phi2; v1; v2];
 
+% Bounds
+dt1_lb = 0.01;
+dt1_ub = 0.12;
+dt2_lb = 0.01;
+dt2_ub = 0.12;
+theta_lb = -2*pi;
+theta_ub = -theta_lb;
+phi_lb = -2*pi;
+phi_ub = -phi_lb;
+v_lb = -100*ones(3,1);
+v_ub = -v_lb;
+lambda_lb = [-4e4; -4e3; 400; -1.5e3; -1.5e3; -80];
+lambda_ub = [6e3; 4e4; 800; 2000; 2000; 80];
+
+lb = [dt1_lb; dt2_lb; lambda_lb; lambda_lb; lambda_lb; 
+      theta_lb; phi_lb; theta_lb; phi_lb;
+      v_lb; v_lb];
+ub = [dt1_ub; dt2_ub; lambda_ub; lambda_ub; lambda_ub; 
+      theta_ub; phi_ub; theta_ub; phi_ub;
+      v_ub; v_ub];
+
 %------------------- Parameters for optimization -------------------%
 tol = 0.04;
 A = zeros(3, 30);
@@ -75,14 +96,28 @@ b = zeros(3, 1);
 b(1) = -tol;
 b(2) = -tol;
 b(3) = tf - t0;
+
 options = optimoptions("fmincon", ...
                        "ConstraintTolerance", 1e-12, ...
                        "FunctionTolerance", 1e-12, ...
                        "MaxIterations", 1e6, ...
                        "UseParallel",true, ...
-                       "MaxFunctionEvaluations", 5e5, ...
+                       "MaxFunctionEvaluations", 1e6, ...
                        "StepTolerance", 1e-15);
-[X, J] = fmincon(@obj_func, X0, A, b, [],[],[],[], @nonlcon,options);
+[X0, J0] = fmincon(@obj_func, X0, A, b, [],[],[],[], @nonlcon,options);
+X = X0;
+fprintf('J=%f\n', J0);
+for i=1:1000
+    [X, J] = fmincon(@obj_func, X, A, b, [],[],[],[], @nonlcon,options);
+    if J < J0
+        X0 = X;
+        J0 = J;
+        fprintf('Iteration %d, J=%f\n', i, J0);
+    else
+        fprintf('Iteration %d, J=%f, Aborted.\n', i, J);
+    end
+end
+
 
 
 %-------------------------------------------------------------------%
@@ -157,19 +192,6 @@ y2p = y2f(1, :)';
 yf = y2f(end, :)';
 tSolve = toc;
 
-%--------------------------- Residuals -----------------------------%
-% Res1: final state
-res1 = yf(1:6) - statef;
-
-% Res2: joint points jump and state continuity - t1
-res2 = [y1p(1:6)-y1m(1:6); y1p(10:12)-y1m(10:12)];
-
-% Res3: joint points jump and state continuity - t2
-res3 = [y2p(1:6)-y2m(1:6); y2p(10:12)-y2m(10:12)];
-
-% Res4: tangent condition
-res4 = [dot(r1guess, v1guess); dot(r2guess, v2guess)];
-
 
 %-------------------------------------------------------------------%
 %--------------------------- Save Data -----------------------------%
@@ -207,10 +229,12 @@ lambda13 = lambda(1:3, :);
 lambda46 = lambda(4:6, :);
 state = [y01(:,1:6)', y12(:,1:6)', y2f(:,1:6)'];
 mu = zeros(length(r), 1);
-eta = zeros(length(r), 1);
+eta1 = zeros(length(r), 1);
+eta2 = zeros(length(r), 1);
 for i=1:length(r)
     if i > size(y01, 1) && i <= size(y01,1) + size(y12,1)
-        eta(i) = 1/(2*rho^2) * (2*state(4:6, i)'*M2*lambda46(:, i) ...
+        
+        eta1(i) = 1/(2*rho^2) * (2*state(4:6, i)'*M2*lambda46(:, i) ...
                    - 4*state(4:6, i)'*lambda13(:, i) ...
                    - 3*(lambda46(:, i)'*lambda46(:, i)) ...
                    + 8*state(1:3, i)'*M1*lambda46(:, i) ...
@@ -220,37 +244,45 @@ for i=1:length(r)
                    - 4*state(1:3, i)'*M1*M1*state(1:3, i) ...
                    - 3*state(1:3, i)'*M1*M2*state(4:6, i) ...
                    - state(1:3, i)'*M2*M1*state(4:6, i));
-    else
-        eta(i) = 0;
-    end
-    mu(i) = 1 / (2 * rho^2) * (state(1:3, i)' * lambda46(:, i) ...
+        eta2(i) = 1/(2*rho^2) * (3*state(4:6, i)'*lambda46(:, i) ...
+                           - state(1:3, i)'*lambda13(:, i) ...
+                           + state(1:3, i)'*M2*lambda46(:, i) ...
+                           -4*state(4:6, i)'*M1*state(1:3, i) ...
+                           - state(1:3, i)'*M2*M1*state(1:3, i) ...
+                           - state(1:3, i)'*M2*M2*state(4:6, i) ...
+                           + state(1:3, i)'*M2*lambda46(:, i));
+        mu(i) = 1 / (2 * rho^2) * (state(1:3, i)' * lambda46(:, i) ...
                 - state(4:6, i)' * state(4:6, i) ...
                 - state(1:3, i)' * M1 * state(1:3, i) ...
                 - state(1:3, i)' * M2 * state(4:6, i));
+    else
+        eta1(i) = 0;
+        eta2(i) = 0;
+        mu(i) = 0;
+    end
+    
 end
 
-save data\indirect_ineq_data.mat rho0 rho x y z ...
+save data/indirect_ineq_data.mat rho0 rho x y z ...
                                  u1 u2 u3 r u tSolve ...
-                                 lambda t J mu eta
+                                 lambda t J mu eta1 eta2
 
 
+%-------------------------------------------------------------------%
+%--------------------------- Residuals -----------------------------%
+%-------------------------------------------------------------------%
+% Res1: final state
+res1 = yf(1:6) - statef;
 
+% Res2: joint points jump and state continuity - t1
+res2 = [y1p(1:6)-y1m(1:6); y1p(10:12)-y1m(10:12)];
 
+% Res3: joint points jump and state continuity - t2
+res3 = [y2p(1:6)-y2m(1:6); y2p(10:12)-y2m(10:12)];
 
+% Res4: tangent condition
+res4 = [dot(r1guess, v1guess); dot(r2guess, v2guess)];
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+% Res5: Jump at the joint point
+mu1_p = mu(size(y01, 1)+1);
+res5 = y1p(7:9) - y1m(7:9) - mu1_p .* y1p(1:3);
