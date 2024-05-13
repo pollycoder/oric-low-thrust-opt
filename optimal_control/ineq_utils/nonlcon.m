@@ -176,7 +176,7 @@ r = sqrt(x.^2 + y.^2 + z.^2);
 rbase = rho .* ones(size(r));
 
 % Final residual
-ceq = [res1; res2; res3; res4];
+ceq = [res1; res2; res3];%; res4];
 c = [max(rbase - r)];
 
 end
