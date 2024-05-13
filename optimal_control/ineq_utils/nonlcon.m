@@ -153,7 +153,7 @@ for i=1:length(r)
                 - state(1:3, i)' * M1 * state(1:3, i) ...
                 - state(1:3, i)' * M2 * state(4:6, i));
 end
-mu1_p = mu(size(y01, 1)+1);
+%mu1_p = mu(size(y01, 1)+1);
 
 %---------------------------- Residuals -----------------------------%
 % Res1: final state
@@ -177,7 +177,7 @@ rbase = rho .* ones(size(r));
 
 % Final residual
 ceq = [res1; res2; res3; res4];
-c = [max(rbase - r), -min(eta2)];
+c = [max(rbase - r)];
 
 end
 

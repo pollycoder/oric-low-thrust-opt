@@ -48,8 +48,8 @@ lambda2 = [-30850.6541415830
            -14.7458926735603];
 
 % t1 and t2
-t1 = 0.0998167723302513;
-t2 = 0.149074508752072;
+t1 = 0.0990745087520720;
+t2 = 0.144206589554252;
 
 % Velocities at t1 and t2
 v1 = [41.6148287058002; -64.7193778424496; -1.36570613231753];
@@ -66,13 +66,13 @@ X0 = [t1; t2-t1; lambda0;lambda1;lambda2;
       theta1; phi1; theta2; phi2; v1; v2];
 
 % Bounds
-dt1_lb = 0.01;
-dt1_ub = 0.12;
-dt2_lb = 0.01;
-dt2_ub = 0.12;
-theta_lb = -2*pi;
-theta_ub = -theta_lb;
-phi_lb = -2*pi;
+dt1_lb = 0.09;
+dt1_ub = 0.11;
+dt2_lb = 0.04;
+dt2_ub = 0.07;
+theta_lb = -pi;
+theta_ub = 0;
+phi_lb = -0.1;
 phi_ub = -phi_lb;
 v_lb = -100*ones(3,1);
 v_ub = -v_lb;
@@ -97,27 +97,24 @@ b(1) = -tol;
 b(2) = -tol;
 b(3) = tf - t0;
 
+%{
 options = optimoptions("fmincon", ...
-                       "ConstraintTolerance", 1e-12, ...
-                       "FunctionTolerance", 1e-12, ...
+                       "ConstraintTolerance", 1e-14, ...
+                       "FunctionTolerance", 1e-20, ...
                        "MaxIterations", 1e6, ...
                        "UseParallel",true, ...
-                       "MaxFunctionEvaluations", 1e6, ...
-                       "StepTolerance", 1e-15);
-[X0, J0] = fmincon(@obj_func, X0, A, b, [],[],[],[], @nonlcon,options);
-X = X0;
-fprintf('J=%f\n', J0);
-for i=1:1000
-    [X, J] = fmincon(@obj_func, X, A, b, [],[],[],[], @nonlcon,options);
-    if J < J0
-        X0 = X;
-        J0 = J;
-        fprintf('Iteration %d, J=%f\n', i, J0);
-    else
-        fprintf('Iteration %d, J=%f, Aborted.\n', i, J);
-    end
-end
+                       "MaxFunctionEvaluations", 3e5, ...
+                       "StepTolerance", 1e-20);
+[X, J] = fmincon(@obj_func, X0, A, b, [],[],[],[], @nonlcon, options);
+%}
 
+%
+options = optimoptions("ga", "ConstraintTolerance", 1e-10, "CreationFcn", ...
+                       "gacreationlinearfeasible", "CrossoverFcn", "crossoverlaplace", ...
+                       "NonlinearConstraintAlgorithm", "auglag", ...
+                       "Display", "iter", "HybridFcn", "patternsearch", 'UseParallel', true);
+[X,fval,exitflag,output,population,~] = ga(@obj_func,30,A,b,[],[],lb,ub,@nonlcon,options);
+%}
 
 
 %-------------------------------------------------------------------%

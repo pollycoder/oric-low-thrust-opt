@@ -174,5 +174,6 @@ u2 = solution.phase.control(:, 2);
 u3 = solution.phase.control(:, 3);
 u = sqrt(u1.^2 + u2.^2 + u3.^2);
 tSolve = output.result.nlptime;
+costate = solution.phase.costate';
 
-save data\gpops_ineq_data.mat x y z u1 u2 u3 r u tSolve t J
+save data\gpops_ineq_data.mat x y z u1 u2 u3 r u tSolve t J costate

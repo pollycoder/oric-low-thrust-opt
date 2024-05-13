@@ -34,7 +34,7 @@ eta2 = 1/(2*rho^2) * (3*v'*lambda46 - r'*lambda13 + r'*M2*lambda46 ...
 
 dydt(1:3) = v;
 dydt(4:6) = M1 * y(1:3) + M2 * v - lambda46;
-dydt(7:9) = - M1 * lambda46 + (2 * eta2) * r;
+dydt(7:9) = - M1 * lambda46 + (2 * eta1) * r;
 dydt(10:12) = M2 * lambda46 - lambda13;
 
 

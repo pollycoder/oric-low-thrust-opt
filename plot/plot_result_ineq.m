@@ -27,6 +27,7 @@ u3_gpops = u3;
 u_gpops = u;
 t_gpops = t;
 tSolve_gpops = tSolve;
+lambda_gpops = costate;
 
 % Indirect - Lagrange Multiplier Data
 path_lag = "data/indirect_ineq_data.mat";
@@ -70,20 +71,55 @@ saveas(f, 'fig/state_ineq','fig');
 
 %------------------------------ Costate ----------------------------%
 f=figure;
-costate = lambda_lag;
-subplot(1, 2, 1)
-plot(t, costate(1, :), 'LineWidth', 1.5);hold on
-plot(t, costate(2, :), 'LineWidth', 1.5);hold on
-plot(t, costate(3, :), 'LineWidth', 1.5);hold on
-legend('\lambda_1', '\lambda_2', '\lambda_3');
-title('\lambda_1 ~ \lambda_3')
 
-subplot(1, 2, 2)
-plot(t, costate(4, :), 'LineWidth', 1.5);hold on
-plot(t, costate(5, :), 'LineWidth', 1.5);hold on
-plot(t, costate(6, :), 'LineWidth', 1.5);
-legend('\lambda_4', '\lambda_5', '\lambda_6');
-title('\lambda_4 ~ \lambda_6');
+subplot(2, 3, 1)
+plot(t_lag, lambda_lag(1, :), ...
+     'LineWidth', 1.5, 'LineStyle', '-');hold on
+plot(t_gpops, lambda_gpops(1, :), ...
+     'LineWidth', 1.5, 'LineStyle', '-');hold on
+legend('Pontryagin', 'GPOPS-II')
+title('\lambda_1')
+
+subplot(2, 3, 2)
+plot(t_lag, lambda_lag(2, :), ...
+     'LineWidth', 1.5, 'LineStyle', '-');hold on
+plot(t_gpops, lambda_gpops(2, :), ...
+     'LineWidth', 1.5, 'LineStyle', '-');hold on
+legend('Pontryagin', 'GPOPS-II')
+title('\lambda_2')
+
+subplot(2, 3, 3)
+plot(t_lag, lambda_lag(3, :), ...
+     'LineWidth', 1.5, 'LineStyle', '-');hold on
+plot(t_gpops, lambda_gpops(3, :), ...
+     'LineWidth', 1.5, 'LineStyle', '-');hold on
+legend('Pontryagin', 'GPOPS-II')
+title('\lambda_3')
+
+subplot(2, 3, 4)
+plot(t_lag, lambda_lag(4, :), ...
+     'LineWidth', 1.5, 'LineStyle', '-');hold on
+plot(t_gpops, lambda_gpops(4, :), ...
+     'LineWidth', 1.5, 'LineStyle', '-');hold on
+legend('Pontryagin', 'GPOPS-II')
+title('\lambda_4')
+
+subplot(2, 3, 5)
+plot(t_lag, lambda_lag(5, :), ...
+     'LineWidth', 1.5, 'LineStyle', '-');hold on
+plot(t_gpops, lambda_gpops(5, :), ...
+     'LineWidth', 1.5, 'LineStyle', '-');hold on
+legend('Pontryagin', 'GPOPS-II')
+title('\lambda_5')
+
+subplot(2, 3, 6)
+plot(t_lag, lambda_lag(6, :), ...
+     'LineWidth', 1.5, 'LineStyle', '-');hold on
+plot(t_gpops, lambda_gpops(6, :), ...
+     'LineWidth', 1.5, 'LineStyle', '-');hold on
+legend('Pontryagin', 'GPOPS-II')
+title('\lambda_6')
+
 saveas(f, 'fig/costate_ineq','fig');
 
 
@@ -117,9 +153,9 @@ title('Multiplier \mu');
 saveas(f, 'fig/mu_ineq','fig');
     
 f=figure;
-%plot(t, eta1_lag, 'LineWidth', 1.5);hold on
+plot(t, eta1_lag, 'LineWidth', 1.5);hold on
 plot(t, eta2_lag, 'LineWidth', 1.5);
-%legend('\eta1', '\eta2')
+legend('\eta1', '\eta2')
 title('Multiplier \eta');
 saveas(f, 'fig/eta_ineq','fig');
 %%
