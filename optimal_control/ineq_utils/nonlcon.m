@@ -160,10 +160,10 @@ end
 res1 = yf(1:6) - statef;
 
 % Res2: joint points jump and state continuity - t1
-res2 = [y1p(1:6)-y1m(1:6); y1p(10:12)-y1m(10:12)];
+res2 = [y1p(1:6)-y1m(1:6); y2p(1:6)-y2m(1:6)];
 
 % Res3: joint points jump and state continuity - t2
-res3 = [y2p(1:6)-y2m(1:6); y2p(10:12)-y2m(10:12)];
+res3 = [y1p(10:12)-y1m(10:12); y2p(10:12)-y2m(10:12)];
 
 % Res4: tangent condition
 res4 = [dot(r1guess, v1guess); dot(r2guess, v2guess)];
@@ -176,7 +176,7 @@ r = sqrt(x.^2 + y.^2 + z.^2);
 rbase = rho .* ones(size(r));
 
 % Final residual
-ceq = [res1; res2; res3];%; res4];
+ceq = [res1; res2; res3; res4];
 c = [max(rbase - r)];
 
 end

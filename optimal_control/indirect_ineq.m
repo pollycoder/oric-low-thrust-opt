@@ -27,43 +27,37 @@ statef = [rho0 * cos(thetaf); rho0 * sin(thetaf); 0; 0; 0; pi];
 %-------------------------------------------------------------------%
 
 %----------------------------- Guess -------------------------------%
-% Lambda at t0, t1, t2
-lambda0 = [22.9444423724889	
-           33530.8874064454	
-           463.372437424655	
-           -1486.67431726342	
-           1613.82304610368	
-           69.1580010840004];
-lambda1 = [-16450.1815123402	
-            19001.2973265684	
-            673.740161518210	
-           -1414.68332810443	
-           -717.708453657806
-            18.5528906459845];
-lambda2 = [-30850.6541415830	
-           -3700.71005509594	
-            616.707806830944	
-           -859.126418227609	
-           -1002.92293539350	
-           -14.7458926735603];
-
-% t1 and t2
-t1 = 0.0980745087520720;
-t2 = 0.149006589554252;
-
-% Velocities at t1 and t2
-v1 = [41.6148287058002; -64.7193778424496; -1.36570613231753];
-v2 = [62.6476324259827; -42.7456628770326; -1.56291874984878];
-
-% Positions at t1 and t2 (spherical coordinate)
-theta1 = -2.55949814018984;
-theta2 = -2.14145326036684;
-phi1 = 0.00515190120742112;
-phi2 = -0.00374951776919052;
-
 % Initial values
-X0 = [t1; t2-t1; lambda0;lambda1;lambda2; 
-      theta1; phi1; theta2; phi2; v1; v2];
+X0 = [0.0986180378172173
+0.0471293400716429
+1.60005396178221
+33575.1630042699
+501.948395030637
+-1487.92244769357
+1615.39207309741
+71.3851660409487
+-14298.3520080422
+20343.0901299145
+645.041087745235
+-1421.43880921637
+-707.406186055086
+17.6754347829748
+-30991.1166087273
+-3658.43961371903
+595.373585692558
+-936.062983191285
+-1038.12804225278
+-13.4746846401911
+-2.56950203984658
+0.00473832723275586
+-2.16953264724358
+-0.00353940186507824
+41.6340574518271
+-64.6692432516573
+-1.40059310194435
+62.7131652829838
+-42.7816910870702
+-1.50594865597552];
 
 % Bounds
 dt1_lb = 0.09;
@@ -97,30 +91,28 @@ b(1) = -tol;
 b(2) = -tol;
 b(3) = tf - t0;
 
-%
-options = optimoptions("fmincon", ...
-                       "ConstraintTolerance", 1e-8, ...
-                       "FunctionTolerance", 1e-10, ...
-                       "MaxIterations", 1e6, ...
-                       "UseParallel",true, ...
-                       "MaxFunctionEvaluations", 3e5, ...
-                       "StepTolerance", 1e-13);
-[X, J] = fmincon(@obj_func, X0, A, b, [],[],[],[], @nonlcon, options);
-%}
-
 %{
-options = optimoptions("ga", "ConstraintTolerance", 1e-10, "CreationFcn", ...
-                       "gacreationlinearfeasible", "CrossoverFcn", "crossoverlaplace", ...
-                       "NonlinearConstraintAlgorithm", "auglag", ...
-                       "Display", "iter", "HybridFcn", "patternsearch", 'UseParallel', true);
-[X,fval,exitflag,output,population,~] = ga(@obj_func,30,A,b,[],[],lb,ub,@nonlcon,options);
+options = optimoptions("fmincon", ...
+                       "ConstraintTolerance", 1e-6, ...
+                       "FunctionTolerance", 1e-12, ...
+                       "MaxIterations", 1e3, ...
+                       "UseParallel",true, ...
+                       "MaxFunctionEvaluations", 1e6, ...
+                       "Algorithm", "sqp", ...
+                       "OptimalityTolerance", 1e-8, ...
+                       "StepTolerance", 1e-15);
+[X, J0] = fmincon(@obj_func, X0, A, b, [],[],[],[], @nonlcon, options);
 %}
 
+%
+[X, result] = fminsearch(@obj_func, X0);
+%}
 
+%%
 %-------------------------------------------------------------------%
 %------------------- Resolve the original problem ------------------%
 %-------------------------------------------------------------------%
-
+X = reshape(X, [30, 1]);
 %------------------------------- Time ------------------------------%
 dt1 = X(1); dt2 = X(2);
 t1 = t0 + dt1; t2 = t1 + dt2;
@@ -155,8 +147,13 @@ r1guess = [x1guess; y1guess; z1guess];
 r2guess = [x2guess; y2guess; z2guess];
 
 % Velocity guess
-v1guess = X(index6:index7-1);
-v2guess = X(index7:index8-1);
+v1guess = zeros(dimV, 1);
+v2guess = zeros(dimV, 1);
+
+for i=1:dimV
+    v1guess(i) = X(index6+i-1);
+    v2guess(i) = X(index7+i-1);
+end
 
 % State guess
 state1_guess = [r1guess; v1guess];
@@ -197,6 +194,9 @@ t = [t01; t12; t2f];
 x = [y01(:,1); y12(:,1); y2f(:,1)];
 y = [y01(:,2); y12(:,2); y2f(:,2)];
 z = [y01(:,3); y12(:,3); y2f(:,3)];
+vx = [y01(:,4); y12(:,4); y2f(:,4)];
+vy = [y01(:,5); y12(:,5); y2f(:,5)];
+vz = [y01(:,6); y12(:,6); y2f(:,6)];
 r = sqrt(x.^2 + y.^2 + z.^2);
 
 % Costate
@@ -279,7 +279,3 @@ res3 = [y2p(1:6)-y2m(1:6); y2p(10:12)-y2m(10:12)];
 
 % Res4: tangent condition
 res4 = [dot(r1guess, v1guess); dot(r2guess, v2guess)];
-
-% Res5: Jump at the joint point
-mu1_p = mu(size(y01, 1)+1);
-res5 = y1p(7:9) - y1m(7:9) - mu1_p .* y1p(1:3);

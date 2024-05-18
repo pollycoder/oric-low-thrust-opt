@@ -18,6 +18,9 @@ J_lag = J;
 x_lag = x;
 y_lag = y;
 z_lag = z;
+vx_lag = vx;
+vy_lag = vy;
+vz_lag = vz;
 r_lag = r;
 u1_lag = u1;
 u2_lag = u2;
@@ -35,21 +38,65 @@ lambda_lag = lambda;
 %------------------------------- State -----------------------------%
 f=figure;
 plot(t_lag, r_lag, 'LineWidth', 1.5);hold on
-title('State');
+title('Position');
+saveas(f, 'fig/position_unc','fig');
+
+f=figure;
+subplot(2, 3, 1)
+plot(t_lag, x_lag, 'LineWidth', 1.5);hold on
+title('x');
+
+subplot(2, 3, 2)
+plot(t_lag, y_lag, 'LineWidth', 1.5);hold on
+title('y');
+
+subplot(2, 3, 3)
+plot(t_lag, z_lag, 'LineWidth', 1.5);hold on
+title('z');
+
+subplot(2, 3, 4)
+plot(t_lag, vx_lag, 'LineWidth', 1.5);hold on
+title('v_x');
+
+subplot(2, 3, 5)
+plot(t_lag, vy_lag, 'LineWidth', 1.5);hold on
+title('v_y');
+
+subplot(2, 3, 6)
+plot(t_lag, vz_lag, 'LineWidth', 1.5);hold on
+title('v_z');
+
 saveas(f, 'fig/state_unc','fig');
+
 
 %------------------------------ Costate ----------------------------%
 costate = lambda;
 f=figure;
+
+subplot(2, 3, 1)
 plot(t, costate(1, :), 'LineWidth', 1.5);hold on
+title('\lambda_1')
+
+subplot(2, 3, 2)
 plot(t, costate(2, :), 'LineWidth', 1.5);hold on
+title('\lambda_2')
+
+subplot(2, 3, 3)
 plot(t, costate(3, :), 'LineWidth', 1.5);hold on
+title('\lambda_3')
+
+subplot(2, 3, 4)
 plot(t, costate(4, :), 'LineWidth', 1.5);hold on
+title('\lambda_4')
+
+subplot(2, 3, 5)
 plot(t, costate(5, :), 'LineWidth', 1.5);hold on
+title('\lambda_5')
+
+subplot(2, 3, 6)
 plot(t, costate(6, :), 'LineWidth', 1.5);
-legend('costate1', 'costate2', 'costate3', ...
-       'costate4', 'costate5', 'costate6');
-title('Costate');
+title('\lambda_6')
+
 saveas(f, 'fig/costate_unc','fig');
 
 

@@ -123,12 +123,12 @@ guess.phase.integral = 0;
 %-------------------------------- Mesh -----------------------------%
 %-------------------------------------------------------------------%
 mesh.method = 'hp1';
-mesh.tolerance = 1e-8; 
+mesh.tolerance = 1e-10; 
 mesh.maxiteration = 1000;
 mesh.colpointmin = 4;
 mesh.colpointmax = 50;
-mesh.phase.colpoints = 4*ones(1,10);
-mesh.phase.fraction = 0.1*ones(1,10);
+mesh.phase.colpoints = 10*ones(1,20);
+mesh.phase.fraction = 0.05*ones(1,20);
 
 
 
@@ -176,4 +176,4 @@ u = sqrt(u1.^2 + u2.^2 + u3.^2);
 tSolve = output.result.nlptime;
 costate = solution.phase.costate';
 
-save data\gpops_ineq_data.mat x y z u1 u2 u3 r u tSolve t J costate
+save data\gpops_ineq_data.mat x y z u1 u2 u3 r u tSolve t J costate vx vy vz

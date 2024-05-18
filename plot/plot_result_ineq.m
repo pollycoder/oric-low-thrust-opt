@@ -76,7 +76,7 @@ subplot(2, 3, 1)
 plot(t_lag, lambda_lag(1, :), ...
      'LineWidth', 1.5, 'LineStyle', '-');hold on
 plot(t_gpops, lambda_gpops(1, :), ...
-     'LineWidth', 1.5, 'LineStyle', '-');hold on
+     'LineWidth', 1.5, 'LineStyle', '--');hold on
 legend('Pontryagin', 'GPOPS-II')
 title('\lambda_1')
 
@@ -84,7 +84,7 @@ subplot(2, 3, 2)
 plot(t_lag, lambda_lag(2, :), ...
      'LineWidth', 1.5, 'LineStyle', '-');hold on
 plot(t_gpops, lambda_gpops(2, :), ...
-     'LineWidth', 1.5, 'LineStyle', '-');hold on
+     'LineWidth', 1.5, 'LineStyle', '--');hold on
 legend('Pontryagin', 'GPOPS-II')
 title('\lambda_2')
 
@@ -92,7 +92,7 @@ subplot(2, 3, 3)
 plot(t_lag, lambda_lag(3, :), ...
      'LineWidth', 1.5, 'LineStyle', '-');hold on
 plot(t_gpops, lambda_gpops(3, :), ...
-     'LineWidth', 1.5, 'LineStyle', '-');hold on
+     'LineWidth', 1.5, 'LineStyle', '--');hold on
 legend('Pontryagin', 'GPOPS-II')
 title('\lambda_3')
 
@@ -100,7 +100,7 @@ subplot(2, 3, 4)
 plot(t_lag, lambda_lag(4, :), ...
      'LineWidth', 1.5, 'LineStyle', '-');hold on
 plot(t_gpops, lambda_gpops(4, :), ...
-     'LineWidth', 1.5, 'LineStyle', '-');hold on
+     'LineWidth', 1.5, 'LineStyle', '--');hold on
 legend('Pontryagin', 'GPOPS-II')
 title('\lambda_4')
 
@@ -108,7 +108,7 @@ subplot(2, 3, 5)
 plot(t_lag, lambda_lag(5, :), ...
      'LineWidth', 1.5, 'LineStyle', '-');hold on
 plot(t_gpops, lambda_gpops(5, :), ...
-     'LineWidth', 1.5, 'LineStyle', '-');hold on
+     'LineWidth', 1.5, 'LineStyle', '--');hold on
 legend('Pontryagin', 'GPOPS-II')
 title('\lambda_5')
 
@@ -116,7 +116,7 @@ subplot(2, 3, 6)
 plot(t_lag, lambda_lag(6, :), ...
      'LineWidth', 1.5, 'LineStyle', '-');hold on
 plot(t_gpops, lambda_gpops(6, :), ...
-     'LineWidth', 1.5, 'LineStyle', '-');hold on
+     'LineWidth', 1.5, 'LineStyle', '--');hold on
 legend('Pontryagin', 'GPOPS-II')
 title('\lambda_6')
 

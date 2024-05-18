@@ -14,9 +14,9 @@ clc;clear
 %-------------------------------------------------------------------%
 omega = 4;                                  
 rho = 10;                                   
-x0 = [-rho; 0; 0; 0; 0; pi];
-xf = [0; -rho; 0; 0; 0; pi];
-t0 = 0; tf = 0.25;
+x0 = [-rho; 0; rho; 0; 0; pi];
+xf = [0; -rho; rho; 0; 0; pi];
+t0 = 0; tf = 10;
 
 
 %-------------------------------------------------------------------%
@@ -57,6 +57,9 @@ fprintf('J = %f', J);
 x = sol.y(1, :);
 y = sol.y(2, :);
 z = sol.y(3, :);
+vx = sol.y(4, :);
+vy = sol.y(5, :);
+vz = sol.y(6, :);
 r = sqrt(x.^2 + y.^2 + z.^2);
 
 % Control
@@ -67,5 +70,5 @@ u = sqrt(u1.^2 + u2.^2 + u3.^2);
 
 save data\indirect_unc_data.mat rho x y z ...
                                u1 u2 u3 r u ...
-                               tSolve lambda t J
+                               tSolve lambda t J vx vy vz
 
