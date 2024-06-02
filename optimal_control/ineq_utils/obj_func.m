@@ -17,41 +17,16 @@ X = reshape(X, [30, 1]);
 %-------------------------------------------------------------------%
 %---------------------------- Constant -----------------------------%
 %-------------------------------------------------------------------%
-rho = 9; 
-rho0 = 10;
+rho = 9.5; 
+rho0 = 10; omega = 4;
 theta0 = pi;
+M1 = diag([3 * omega^2, 0, -omega^2]);
+M2 = diag([2 * omega, 0], 1) + diag([-2 * omega, 0], -1);
 
 t0 = 0; tf = 0.25;
 dt1 = X(1); dt2 = X(2);
 t1 = t0 + dt1; t2 = t1 + dt2;
 state0 = [rho0 * cos(theta0); rho0 * sin(theta0); 0; 0; 0; pi];
-
-
-%-------------------------------------------------------------------%
-%--------------------------- Constraint ----------------------------%
-%-------------------------------------------------------------------%
-alpha_eq = 1e4;
-alpha_neq = 1e3;
-ctol = 0;
-%----------------------------- Linear ------------------------------%
-tol = 0.04;
-A = zeros(3, 30);
-A(1,1) = -1;
-A(2,2) = -1;
-A(3, 1:2) = ones(1, 2);
-b = zeros(3, 1);
-b(1) = -tol;
-b(2) = -tol;
-b(3) = tf - t0;
-res1 = sign(max(A*X - b) + ctol) + 1;
-
-
-%--------------------------- Non Linear ----------------------------%
-[c, ceq] = nonlcon(X);
-res2 = sum(ceq.^2);
-res3 = sign(max(c) + ctol) + 1;
-
-penalty = alpha_eq * res2 + alpha_neq * (res1 + res3);
 
 
 %-------------------------------------------------------------------%
@@ -128,20 +103,44 @@ y2p_guess = [state2_guess; lambda2p_guess];
 % Arc3: off
 [t2f, y2f] = ode45(@odefun_off, [t2, tf], y2p_guess, options);
 
-%------------------------------ Index ------------------------------%
-u01 = -y01(:, 10:12)';
-u12 = -y12(:, 10:12)';
-u2f = -y2f(:, 10:12)';
-u01norm = vecnorm(u01);
-u12norm = vecnorm(u12);
-u2fnorm = vecnorm(u2f);
-dJ01 = 0.5*u01norm.^2;
-dJ12 = 0.5*u12norm.^2;
-dJ2f = 0.5*u2fnorm.^2;
+%-------------------------- Integration ----------------------------%
+t = [t01; t12; t2f];
+x = [y01(:,1); y12(:,1); y2f(:,1)];
+y = [y01(:,2); y12(:,2); y2f(:,2)];
+z = [y01(:,3); y12(:,3); y2f(:,3)];
+r = sqrt(x.^2 + y.^2 + z.^2);
 
-%penalty = 0;
-Jhat = trapz(t01, dJ01) + trapz(t12, dJ12) + trapz(t2f, dJ2f)...
-       + penalty ;
+% Costate
+costate = [y01(:,7:12)', y12(:,7:12)', y2f(:,7:12)'];
+lambda = costate;
+
+% Control
+uvec = -[y01(:, 10:12)', y12(:, 10:12)', y2f(:, 10:12)'];
+
+% Lagrange multiplier - mu and eta
+lambda46 = lambda(4:6, :);
+state = [y01(:,1:6)', y12(:,1:6)', y2f(:,1:6)'];
+mu = zeros(length(r), 1);
+for i=1:length(r)
+    if i <= size(y01, 1) || i > size(y01, 1) + size(y12, 1)
+        mu(i) = 0;
+    else
+        mu(i) = 1 / (2 * rho^2) * (state(1:3, i)' * lambda46(:, i) ...
+                - state(4:6, i)' * state(4:6, i) ...
+                - state(1:3, i)' * M1 * state(1:3, i) ...
+                - state(1:3, i)' * M2 * state(4:6, i));
+    end
+    uvec(:, i) = 2 .* mu(i) .* [x(i); y(i); z(i)] + uvec(:, i);
+end
+
+% Control norm
+u = vecnorm(uvec);
+
+% Integration target
+dJ = 0.5 * u.^2;
+J = trapz(t, dJ);
+
+Jhat = J;
 
 end
 

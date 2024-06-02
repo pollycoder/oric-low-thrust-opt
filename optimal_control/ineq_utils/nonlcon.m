@@ -17,7 +17,7 @@ function [c, ceq] = nonlcon(X)
 %-------------------------------------------------------------------%
 %---------------------------- Constant -----------------------------%
 %-------------------------------------------------------------------%
-rho = 9; 
+rho = 9.5; 
 rho0 = 10; omega = 4;
 theta0 = pi; thetaf = theta0 + pi/2;
 M1 = diag([3 * omega^2, 0, -omega^2]);
@@ -153,7 +153,6 @@ for i=1:length(r)
                 - state(1:3, i)' * M1 * state(1:3, i) ...
                 - state(1:3, i)' * M2 * state(4:6, i));
 end
-%mu1_p = mu(size(y01, 1)+1);
 
 %---------------------------- Residuals -----------------------------%
 % Res1: final state
@@ -163,10 +162,33 @@ res1 = yf(1:6) - statef;
 res2 = [y1p(1:6)-y1m(1:6); y2p(1:6)-y2m(1:6)];
 
 % Res3: joint points jump and state continuity - t2
-res3 = [y1p(10:12)-y1m(10:12); y2p(10:12)-y2m(10:12)];
+res3 = [y1p(10:12)-y1m(10:12); y2p(10:12)-y2m(10:12);
+        (y1p(7:9) - y1m(7:9))./norm(y1p(7:9) - y1m(7:9)) ...
+        - (y1p(1:3))./norm(y1p(1:3));
+        (y2p(7:9) - y2m(7:9))./norm(y2p(7:9) - y2m(7:9)) ...
+        - (y2p(1:3))./norm(y2p(1:3))];
 
 % Res4: tangent condition
 res4 = [dot(r1guess, v1guess); dot(r2guess, v2guess)];
+
+% Res5: Hamilton continuity
+H1p = -1/2 * (y1p(10:12)' * y1p(10:12)) ...
+           + y1p(7:9)' * y1p(4:6) ...
+           + y1p(10:12)' * M1 * y1p(1:3) ...
+           + y1p(10:12)' * M2 * y1p(4:6);
+H1m = -1/2 * (y1m(10:12)' * y1m(10:12)) ...
+           + y1m(7:9)' * y1m(4:6) ...
+           + y1m(10:12)' * M1 * y1m(1:3) ...
+           + y1m(10:12)' * M2 * y1m(4:6);
+H2p = -1/2 * (y2p(10:12)' * y2p(10:12)) ...
+           + y2p(7:9)' * y2p(4:6) ...
+           + y2p(10:12)' * M1 * y2p(1:3) ...
+           + y2p(10:12)' * M2 * y2p(4:6);
+H2m = -1/2 * (y2m(10:12)' * y2m(10:12)) ...
+           + y2m(7:9)' * y2m(4:6) ...
+           + y2m(10:12)' * M1 * y2m(1:3) ...
+           + y2m(10:12)' * M2 * y2m(4:6);
+res5 = [H1p - H1m; H2p - H2m];
 
 % Constriant
 x = [y01(:,1);y12(:,1);y2f(:,1)];
@@ -176,7 +198,7 @@ r = sqrt(x.^2 + y.^2 + z.^2);
 rbase = rho .* ones(size(r));
 
 % Final residual
-ceq = [res1; res2; res3; res4];
+ceq = [res1; res2; res3; res4; res5];
 c = [max(rbase - r)];
 
 end

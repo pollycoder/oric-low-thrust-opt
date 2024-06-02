@@ -11,7 +11,7 @@ dydt = zeros(12, 1);
 
 % Constant
 omega = 4;                                  % angular velocity, 4 rad/h
-rho = 9;
+rho = 9.5;
 
 % Matrix
 M1 = diag([3 * omega^2, 0, -omega^2]);
@@ -29,26 +29,10 @@ eta1 = 1/(2*rho^2) * (2*v'*M2*lambda46 - 4*v'*lambda13 ...
                    -4*v'*M1*v - 4*r'*M1*M1*r - 3*r'*M1*M2*v ...
                    - r'*M2*M1*v);
 
-eta2 = 1/(2*rho^2) * (3*v'*lambda46 - r'*lambda13 + 2*r'*M2*lambda46 ...
-                     -4*v'*M1*r - r'*M2*M1*r - r'*M2*M2*v);
-
 dydt(1:3) = v;
 dydt(4:6) = M1 * y(1:3) + M2 * v - lambda46;
 dydt(7:9) = - M1 * lambda46 + (2 * eta1) * r;
 dydt(10:12) = M2 * lambda46 - lambda13;
-
-
-%{
-mu = 1 / (2 * rho^2) * (r' * lambda46 - v' * v ...
-                        - r' * M1 * r - r' * M2 * v);
-
-% Equations
-dydt(1:3) = v;
-dydt(4:6) = M1 * y(1:3) + M2 * v + 2 * mu * r - lambda46;
-dydt(7:9) = (4 * mu) * M1 * r - M1 * lambda46 ...
-            - (2 * mu) * M2 * v + (4 * mu^2) * r - (2 * mu) * lambda46;
-dydt(10:12) = M2 * lambda46 - lambda13 + (4 * mu) * v - (2 * mu) * M2 * r;
-%}
 
 end
 

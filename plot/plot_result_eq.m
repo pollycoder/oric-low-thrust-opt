@@ -79,6 +79,7 @@ f=figure;
 plot(t_lag, r_lag, 'LineWidth', 1.5);hold on
 plot(t_pen, r_pen, 'LineWidth', 1.5, 'LineStyle', '-.');hold on
 plot(t_gpops, r_gpops, 'LineWidth', 1.5, 'LineStyle', '--');
+axis equal
 legend('Pontryagin', 'Penalty', 'GPOPS-II');
 title('State');
 saveas(f, 'fig/state_eq','fig');

@@ -21,7 +21,7 @@ auxdata.M2 = diag([2 * omega, 0], 1) + diag([-2 * omega, 0], -1);
 % Distance - initial, final, bounds
 rho0 = 10;
 rhof = 10;
-rho_lb = 9;
+rho_lb = 9.5;
 rho_ub = 10;
 
 % Time - initial, final
@@ -123,7 +123,7 @@ guess.phase.integral = 0;
 %-------------------------------- Mesh -----------------------------%
 %-------------------------------------------------------------------%
 mesh.method = 'hp1';
-mesh.tolerance = 1e-10; 
+mesh.tolerance = 1e-8; 
 mesh.maxiteration = 1000;
 mesh.colpointmin = 4;
 mesh.colpointmax = 50;
@@ -157,7 +157,7 @@ output = gpops2(setup);
 solution = output.result.solution;
 J = solution.phase.integral;
 
-
+%%
 %-------------------------------------------------------------------%
 %---------------------------- Save Data ----------------------------%
 %-------------------------------------------------------------------%
@@ -175,5 +175,25 @@ u3 = solution.phase.control(:, 3);
 u = sqrt(u1.^2 + u2.^2 + u3.^2);
 tSolve = output.result.nlptime;
 costate = solution.phase.costate';
+lambda13 = costate(1:3, :);
+lambda46 = costate(4:6, :);
+state = [x';y';z';vx';vy';vz'];
 
-save data\gpops_ineq_data.mat x y z u1 u2 u3 r u tSolve t J costate vx vy vz
+mu = zeros(length(r), 1);
+H = zeros(length(r), 1);
+for i=1:length(r)
+    tol = 1e-8;
+    if abs(r(i) - 9) > tol
+        mu(i) = 0;
+    else
+        rho = 9;
+        mu(i) = 1 / (2 * rho^2) * (state(1:3, i)' * lambda46(:, i) ...
+                - state(4:6, i)' * state(4:6, i) ...
+                - state(1:3, i)' * auxdata.M1 * state(1:3, i) ...
+                - state(1:3, i)' * auxdata.M2 * state(4:6, i));
+    end
+    H(i) = -1/2 * (lambda46(:, i)' * lambda46(:, i)) + lambda13(:, i)' * state(4:6, i) ...
+           + lambda46(:, i)' * auxdata.M1 * state(1:3, i) + lambda46(:, i)' * auxdata.M2 * state(4:6, i);
+end
+
+save data\gpops_ineq_data.mat x y z u1 u2 u3 r u tSolve t J costate vx vy vz mu H

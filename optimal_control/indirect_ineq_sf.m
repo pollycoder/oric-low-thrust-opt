@@ -10,10 +10,12 @@ clc;clear
 %-------------------------------------------------------------------%
 %---------------------------- Constant -----------------------------%
 %-------------------------------------------------------------------%
-rho = 10; 
-rho0 = 10; omega = 4;
+rho0 = 10; rho = 9;
+theta0 = pi; omega = 4;
+thetaf = theta0 + pi / 2;
 M1 = diag([3 * omega^2, 0, -omega^2]);
 M2 = diag([2 * omega, 0], 1) + diag([-2 * omega, 0], -1);
+x0 = [rho0 * cos(theta0); rho0 * sin(theta0); 0; 0; 0; pi];
 
 % Time
 t0 = 0;
@@ -25,7 +27,7 @@ tf = 0.25;
 %-------------------------------------------------------------------%
 n = 1e2;
 tmesh = linspace(t0, tf, n);
-yguess = ones(12, 1);
+yguess = [x0; 1e3.*ones(6, 1)];
 solinit = bvpinit(tmesh, yguess);
 options = bvpset('Stats','on','RelTol',1e-12, 'Nmax', 100000);
 

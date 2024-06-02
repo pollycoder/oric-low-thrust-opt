@@ -11,7 +11,7 @@ clc;clear
 %-------------------------------------------------------------------%
 %---------------------------- Constant -----------------------------%
 %-------------------------------------------------------------------%
-rho = 9; 
+rho = 9.5; 
 rho0 = 10; omega = 4;
 theta0 = pi; thetaf = theta0 + pi/2;
 M1 = diag([3 * omega^2, 0, -omega^2]);
@@ -27,61 +27,31 @@ statef = [rho0 * cos(thetaf); rho0 * sin(thetaf); 0; 0; 0; pi];
 %-------------------------------------------------------------------%
 
 %----------------------------- Guess -------------------------------%
+% Lambda at t0, t1, t2
+lambda0 = 1e3 .* ones(6, 1);
+lambda1 = 1e3 .* ones(6, 1);
+lambda2 = 1e3 .* ones(6, 1);
+
+% t1 and t2
+t1 = 0.1;
+t2 = 0.15;
+
+% Velocities at t1 and t2
+v1 = [40 .* ones(2, 1); 1];
+v2 = [40 .* ones(2, 1); 1];
+
+% Positions at t1 and t2 (spherical coordinate)
+theta1 = -2.6;
+theta2 = -2.1;
+phi1 = 0.005;
+phi2 = -0.004;
+
 % Initial values
-X0 = [0.0986180378172173
-0.0471293400716429
-1.60005396178221
-33575.1630042699
-501.948395030637
--1487.92244769357
-1615.39207309741
-71.3851660409487
--14298.3520080422
-20343.0901299145
-645.041087745235
--1421.43880921637
--707.406186055086
-17.6754347829748
--30991.1166087273
--3658.43961371903
-595.373585692558
--936.062983191285
--1038.12804225278
--13.4746846401911
--2.56950203984658
-0.00473832723275586
--2.16953264724358
--0.00353940186507824
-41.6340574518271
--64.6692432516573
--1.40059310194435
-62.7131652829838
--42.7816910870702
--1.50594865597552];
-
-% Bounds
-dt1_lb = 0.09;
-dt1_ub = 0.11;
-dt2_lb = 0.04;
-dt2_ub = 0.07;
-theta_lb = -pi;
-theta_ub = 0;
-phi_lb = -0.1;
-phi_ub = -phi_lb;
-v_lb = -100*ones(3,1);
-v_ub = -v_lb;
-lambda_lb = [-4e4; -4e3; 400; -1.5e3; -1.5e3; -80];
-lambda_ub = [6e3; 4e4; 800; 2000; 2000; 80];
-
-lb = [dt1_lb; dt2_lb; lambda_lb; lambda_lb; lambda_lb; 
-      theta_lb; phi_lb; theta_lb; phi_lb;
-      v_lb; v_lb];
-ub = [dt1_ub; dt2_ub; lambda_ub; lambda_ub; lambda_ub; 
-      theta_ub; phi_ub; theta_ub; phi_ub;
-      v_ub; v_ub];
+X0 = [t1; t2-t1; lambda0;lambda1;lambda2; 
+      theta1; phi1; theta2; phi2; v1; v2];
 
 %------------------- Parameters for optimization -------------------%
-tol = 0.04;
+tol = 1e-6;
 A = zeros(3, 30);
 A(1,1) = -1;
 A(2,2) = -1;
@@ -91,21 +61,31 @@ b(1) = -tol;
 b(2) = -tol;
 b(3) = tf - t0;
 
-%{
+%
 options = optimoptions("fmincon", ...
-                       "ConstraintTolerance", 1e-6, ...
-                       "FunctionTolerance", 1e-12, ...
+                       "ConstraintTolerance", 1e-8, ...
+                       "FunctionTolerance", 1e-8, ...
                        "MaxIterations", 1e3, ...
                        "UseParallel",true, ...
                        "MaxFunctionEvaluations", 1e6, ...
                        "Algorithm", "sqp", ...
                        "OptimalityTolerance", 1e-8, ...
-                       "StepTolerance", 1e-15);
-[X, J0] = fmincon(@obj_func, X0, A, b, [],[],[],[], @nonlcon, options);
+                       "StepTolerance", 1e-15, ...
+                       "Display", "iter");
+[X, result] = fmincon(@obj_func, X0, A, b, [],[],[],[], @nonlcon, options);
 %}
 
-%
-[X, result] = fminsearch(@obj_func, X0);
+%{
+options = optimoptions('fsolve', ...
+                       'Algorithm','levenberg-marquardt', ...
+                       'FunctionTolerance', 1e-8, ...
+                       'OptimalityTolerance', 1e-8, ...
+                       'MaxIterations', 1e5, ...
+                       'StepTolerance', 1e-15, ...
+                       'MaxFunctionEvaluations', 1e5, ...
+                       'Display', 'iter', ...
+                       'UseParallel',  true);
+X = fsolve(@nonlcon, X0, options);
 %}
 
 %%
@@ -204,28 +184,14 @@ costate = [y01(:,7:12)', y12(:,7:12)', y2f(:,7:12)'];
 lambda = costate;
 
 % Control
-u01 = -y01(:, 10:12)';
-u12 = -y12(:, 10:12)';
-u2f = -y2f(:, 10:12)';
-u1 = [u01(1,:), u12(1,:), u2f(1,:)]';
-u2 = [u01(2,:), u12(2,:), u2f(2,:)]';
-u3 = [u01(3,:), u12(3,:), u2f(3,:)]';
-u01norm = vecnorm(u01);
-u12norm = vecnorm(u12);
-u2fnorm = vecnorm(u2f);
-u = [u01norm, u12norm, u2fnorm]';
-
-% Integration target
-dJ01 = 0.5*u01norm.^2;
-dJ12 = 0.5*u12norm.^2;
-dJ2f = 0.5*u2fnorm.^2;
-J = trapz(t01, dJ01) + trapz(t12, dJ12) + trapz(t2f, dJ2f);
+uvec = -[y01(:, 10:12)', y12(:, 10:12)', y2f(:, 10:12)'];
 
 % Lagrange multiplier - mu and eta
 lambda13 = lambda(1:3, :);
 lambda46 = lambda(4:6, :);
 state = [y01(:,1:6)', y12(:,1:6)', y2f(:,1:6)'];
 mu = zeros(length(r), 1);
+H = zeros(length(r), 1);
 eta1 = zeros(length(r), 1);
 eta2 = zeros(length(r), 1);
 for i=1:length(r)
@@ -246,15 +212,33 @@ for i=1:length(r)
                            - state(1:3, i)'*M2*M1*state(1:3, i) ...
                            - state(1:3, i)'*M2*M2*state(4:6, i) ...
                            + state(1:3, i)'*M2*lambda46(:, i));
+    if i <= size(y01, 1) || i > size(y01, 1) + size(y12, 1)
+        mu(i) = 0;
+        eta1(i) = 0;
+    else
         mu(i) = 1 / (2 * rho^2) * (state(1:3, i)' * lambda46(:, i) ...
                 - state(4:6, i)' * state(4:6, i) ...
                 - state(1:3, i)' * M1 * state(1:3, i) ...
-                - state(1:3, i)' * M2 * state(4:6, i));    
+                - state(1:3, i)' * M2 * state(4:6, i));
+    end
+    H(i) = -1/2 * (lambda46(:, i)' * lambda46(:, i)) + lambda13(:, i)' * state(4:6, i) ...
+           + lambda46(:, i)' * M1 * state(1:3, i) + lambda46(:, i)' * M2 * state(4:6, i);
 end
+
+% Control components and norm
+u1 = uvec(1, :)';
+u2 = uvec(2, :)';
+u3 = uvec(3, :)';
+u = vecnorm(uvec);
+
+% Integration target
+dJ = 0.5*u.^2;
+J = trapz(t, dJ);
+
 
 save data/indirect_ineq_data.mat rho0 rho x y z ...
                                  u1 u2 u3 r u tSolve ...
-                                 lambda t J mu eta1 eta2
+                                 lambda t J mu eta1 eta2 H
 
 
 %-------------------------------------------------------------------%
