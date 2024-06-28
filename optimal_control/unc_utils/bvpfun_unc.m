@@ -9,7 +9,7 @@
 function dydt = bvpfun_unc(t, y)
 dydt = zeros(12, 1);
 % Constant
-omega = 40;                                  % angular velocity, 4 rad/h
+omega = 4;                                  % angular velocity, 4 rad/h
 
 % Matrix
 M1 = diag([3 * omega^2, 0, -omega^2]);

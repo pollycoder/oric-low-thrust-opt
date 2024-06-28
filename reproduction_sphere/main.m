@@ -17,7 +17,7 @@ xf = [0, -10, 0, 0, 0, pi]';
 t0 = 0;
 tf = 0.25;
 tValue = linspace(t0, tf, 1000);
-g = 100;
+g = 10;
 omega = 4;
 M1 = diag([3 * omega^2, 0, -omega^2]);
 M2 = diag([2 * omega, 0], 1) + diag([-2 * omega, 0], -1);
@@ -83,9 +83,15 @@ u1y = u(2, index)';
 u1z = u(3, index)';
 
 figure
-u = u1x.^2 + u1y.^2 + u1z.^2;
-plot(tValue(index), u, 'LineWidth', 1.5);
+tcubic = tValue(index);
+u1cubic = u1x;
+u2cubic = u1y;
+u3cubic = u1z;
+u = sqrt(u1x.^2 + u1y.^2 + u1z.^2);
+ucubic = u;
+plot(tcubic, u, 'LineWidth', 1.5);
 
-
+%%
+save data/cubicfitrot_data.mat ucubic tcubic u1cubic u2cubic u3cubic
 
 

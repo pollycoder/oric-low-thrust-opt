@@ -21,7 +21,7 @@ auxdata.M2 = diag([2 * omega, 0], 1) + diag([-2 * omega, 0], -1);
 % Distance - initial, final, bounds
 rho0 = 10;
 rhof = 10;
-rho_lb = 9.5;
+rho_lb = 8.8;
 rho_ub = 10;
 
 % Time - initial, final

@@ -54,7 +54,7 @@ eta2_lag = eta2;
 %-------------------------------------------------------------------%
 %-------------------------- Error Analysis -------------------------%
 %-------------------------------------------------------------------%
-rho_ineq = 9.5;
+rho_ineq = 8.8;
 res_gpops = min(r_gpops) - rho_ineq;
 res_lag = min(r_lag) - rho_ineq;
 
@@ -62,17 +62,16 @@ res_lag = min(r_lag) - rho_ineq;
 %-------------------------------------------------------------------%
 %------------------------------- Plot ------------------------------%
 %-------------------------------------------------------------------%
-
-%%
+num_str = '_8_8';
 %------------------------------- State -----------------------------%
 f=figure;
 plot(t_lag, r_lag, 'LineWidth', 1.5);hold on
 plot(t_gpops, R_gpops, 'LineWidth', 1.5, 'LineStyle', '--');
 legend('Pontryagin', 'GPOPS-II');
 title('State - pos');
-saveas(f, 'fig/state_ineq','fig');
+saveas(f, ['fig/state_ineq' num_str],'fig');
 
-%%
+
 %------------------------------ Costate ----------------------------%
 f=figure;
 
@@ -124,9 +123,9 @@ plot(t_gpops, lambda_gpops(6, :), ...
 legend('Pontryagin', 'GPOPS-II')
 title('\lambda_6')
 
-saveas(f, 'fig/costate_ineq','fig');
+saveas(f, ['fig/costate_ineq' num_str],'fig');
 
-%%
+
 %------------------------------ Control ----------------------------%
 f=figure;
 plot(t_lag, u1_lag, 'LineWidth', 1.5, 'LineStyle', '-');hold on
@@ -140,38 +139,39 @@ legend('control1 - Pontryagin', 'control2 - Pontryagin', ...
        'control1 - GPOPS-II', 'control2 - GPOPS-II', ...
        'control3 - GPOPS-II');
 title('Control');
-saveas(f, 'fig/control_ineq','fig');
+saveas(f, ['fig/control_ineq' num_str],'fig');
 
-%%
+
 %------------------------ Norm of Control --------------------------%
 f=figure;
 plot(t_lag, u_lag, 'LineWidth', 1.5);hold on
 plot(t_gpops, u_gpops, 'LineWidth', 1.5, 'LineStyle', '--');hold on
 legend('Pontryagin', 'GPOPS-II')
 title('Control - Norm');
-saveas(f, 'fig/controlNorm_ineq','fig');
+saveas(f, ['fig/controlNorm_ineq' num_str],'fig');
 
-%%
+
 %--------------------------- Multiplier ----------------------------%
 f=figure;
 plot(t_lag, mu_lag, 'LineWidth', 1.5); hold on
 plot(t_gpops, mu_gpops, 'LineWidth', 1.5, 'LineStyle', '--'); hold on
+axis equal
 title('Multiplier \mu');
-saveas(f, 'fig/mu_ineq','fig');
+saveas(f, ['fig/mu_ineq' num_str],'fig');
     
 f=figure;
 plot(t_lag, eta1_lag, 'LineWidth', 1.5);hold on
 title('Multiplier \eta');
-saveas(f, 'fig/eta_ineq','fig');
+saveas(f, ['fig/eta_ineq' num_str], 'fig');
 
-%%
+
 %---------------------------- Hamilton -----------------------------%
 f=figure;
 plot(t_lag, H_lag, 'LineWidth', 1.5); hold on
 plot(t_gpops, H_gpops, 'LineWidth', 1.5, 'LineStyle', '--'); hold on
 title('Hamilton');
-saveas(f, 'fig/H_ineq','fig');
-%%
+saveas(f, ['fig/H_ineq' num_str], 'fig');
+
 %--------------------------- Trajectory ----------------------------%
 f=figure;  
 plot3(x_lag, y_lag, z_lag, 'LineWidth', 1.5);hold on
@@ -197,4 +197,4 @@ axis equal
 
 legend('Pontryagin', 'GPOPS-II')
 title('Trajectory');
-saveas(f, 'fig/trajectory_ineq','fig');
+saveas(f, ['fig/trajectory_ineq' num_str],'fig');

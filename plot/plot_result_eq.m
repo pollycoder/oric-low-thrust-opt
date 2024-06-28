@@ -12,6 +12,10 @@ clc;clear
 %---------------------------- Load Data ----------------------------%
 %-------------------------------------------------------------------%
 
+% CubicFitRot Data
+path_cubic = "data/cubicfitrot_data.mat";
+load(path_cubic);
+
 % GPOPS-II Data
 path_gpops = "data/gpops_eq_data.mat";
 load(path_gpops);
@@ -125,34 +129,42 @@ title('\lambda_6')
 saveas(f, 'fig/costate_eq','fig');
 
 %------------------------------ Control ----------------------------%
-f=figure;
+f1=figure;
 plot(t_lag, u1_lag, 'LineWidth', 1.5, 'LineStyle', '-');hold on
-plot(t_lag, u2_lag, 'LineWidth', 1.5, 'LineStyle', '-');hold on
-plot(t_lag, u3_lag, 'LineWidth', 1.5, 'LineStyle', '-');hold on
 plot(t_pen, u1_pen, 'LineWidth', 1.5, 'LineStyle', '-.');hold on
-plot(t_pen, u2_pen, 'LineWidth', 1.5, 'LineStyle', '-.');hold on
-plot(t_pen, u3_pen, 'LineWidth', 1.5, 'LineStyle', '-.');hold on
 plot(t_gpops, u1_gpops, 'LineWidth', 1.5, 'LineStyle', '--');hold on
+plot(tcubic, u1cubic, 'LineWidth', 1.5, 'LineStyle', ':');hold on
+legend('Pontryagin', 'Penalty', 'GPOPS-II', 'CubicFitRot')
+title('Control-x');
+
+f2=figure;
+plot(t_lag, u2_lag, 'LineWidth', 1.5, 'LineStyle', '-');hold on
+plot(t_pen, u2_pen, 'LineWidth', 1.5, 'LineStyle', '-.');hold on
 plot(t_gpops, u2_gpops, 'LineWidth', 1.5, 'LineStyle', '--');hold on
+plot(tcubic, u2cubic, 'LineWidth', 1.5, 'LineStyle', ':');hold on
+legend('Pontryagin', 'Penalty', 'GPOPS-II', 'CubicFitRot')
+title('Control-y');
+
+f3=figure;
+plot(t_lag, u3_lag, 'LineWidth', 1.5, 'LineStyle', '-');hold on
+plot(t_pen, u3_pen, 'LineWidth', 1.5, 'LineStyle', '-.');hold on
 plot(t_gpops, u3_gpops, 'LineWidth', 1.5, 'LineStyle', '--');hold on
-legend('control1 - Pontryagin', ...
-       'control2 - Pontryagin', ...
-       'control3 - Pontryagin', ...
-       'control1 - Penalty', ...
-       'control2 - Penalty', ...
-       'control3 - Indirect (Penalty)', ...
-       'control1 - GPOPS-II', ...
-       'control2 - GPOPS-II', ...
-       'control3 - GPOPS-II');
-title('Control');
-saveas(f, 'fig/control_eq','fig');
+plot(tcubic, u3cubic, 'LineWidth', 1.5, 'LineStyle', ':');hold on
+legend('Pontryagin', 'Penalty', 'GPOPS-II', 'CubicFitRot')
+title('Control-z');
+
+
+saveas(f1, 'fig/control1_eq','fig');
+saveas(f2, 'fig/control2_eq','fig');
+saveas(f3, 'fig/control3_eq','fig');
 
 %------------------------ Norm of Control --------------------------%
 f=figure;
 plot(t_lag, u_lag, 'LineWidth', 1.5, 'LineStyle', '-');hold on
 plot(t_pen, u_pen, 'LineWidth', 1.5, 'LineStyle', '-.');hold on
 plot(t_gpops, u_gpops, 'LineWidth', 1.5, 'LineStyle', '--');hold on
-legend('Indirect (Pontryagin)', 'Indirect (Penalty)', 'GPOPS-II');
+plot(tcubic, ucubic, 'LineWidth', 1.5, 'LineStyle', ':');hold on
+legend('Indirect (Pontryagin)', 'Indirect (Penalty)', 'GPOPS-II', 'CubicFitRot');
 title('Control Norm');
 saveas(f, 'fig/controlNorm_eq','fig');
 
