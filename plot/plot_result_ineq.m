@@ -7,13 +7,13 @@
 % Journal of Guidance, Control, and Dynamics, 2023, 46(4): 666-679. %                                                
 %-------------------------------------------------------------------%
 clc;clear
-
+num_str = '_8_8';
 %-------------------------------------------------------------------%
 %---------------------------- Load Data ----------------------------%
 %-------------------------------------------------------------------%
 
 % GPOPS-II Data
-path_gpops = "data/gpops_ineq_data.mat";
+path_gpops = ['data/gpops_ineq_data', num_str,'.mat'];
 load(path_gpops);
 J_gpops = J;
 x_gpops = x;
@@ -32,7 +32,7 @@ mu_gpops = mu;
 H_gpops = H;
 
 % Indirect - Lagrange Multiplier Data
-path_lag = "data/indirect_ineq_data.mat";
+path_lag = ['data/indirect_ineq_data', num_str, '.mat'];
 load(path_lag);
 J_lag = J;
 x_lag = x;
@@ -62,13 +62,14 @@ res_lag = min(r_lag) - rho_ineq;
 %-------------------------------------------------------------------%
 %------------------------------- Plot ------------------------------%
 %-------------------------------------------------------------------%
-num_str = '_8_8';
 %------------------------------- State -----------------------------%
 f=figure;
 plot(t_lag, r_lag, 'LineWidth', 1.5);hold on
 plot(t_gpops, R_gpops, 'LineWidth', 1.5, 'LineStyle', '--');
 legend('Pontryagin', 'GPOPS-II');
-title('State - pos');
+xlabel('t')
+ylabel('r')
+title('Distance Between Chief and Deputy')
 saveas(f, ['fig/state_ineq' num_str],'fig');
 
 
@@ -81,6 +82,8 @@ plot(t_lag, lambda_lag(1, :), ...
 plot(t_gpops, lambda_gpops(1, :), ...
      'LineWidth', 1.5, 'LineStyle', '--');hold on
 legend('Pontryagin', 'GPOPS-II')
+xlabel('t')
+ylabel('\lambda_1')
 title('\lambda_1')
 
 subplot(2, 3, 2)
@@ -89,6 +92,8 @@ plot(t_lag, lambda_lag(2, :), ...
 plot(t_gpops, lambda_gpops(2, :), ...
      'LineWidth', 1.5, 'LineStyle', '--');hold on
 legend('Pontryagin', 'GPOPS-II')
+xlabel('t')
+ylabel('\lambda_2')
 title('\lambda_2')
 
 subplot(2, 3, 3)
@@ -97,6 +102,8 @@ plot(t_lag, lambda_lag(3, :), ...
 plot(t_gpops, lambda_gpops(3, :), ...
      'LineWidth', 1.5, 'LineStyle', '--');hold on
 legend('Pontryagin', 'GPOPS-II')
+xlabel('t')
+ylabel('\lambda_3')
 title('\lambda_3')
 
 subplot(2, 3, 4)
@@ -105,6 +112,8 @@ plot(t_lag, lambda_lag(4, :), ...
 plot(t_gpops, lambda_gpops(4, :), ...
      'LineWidth', 1.5, 'LineStyle', '--');hold on
 legend('Pontryagin', 'GPOPS-II')
+xlabel('t')
+ylabel('\lambda_4')
 title('\lambda_4')
 
 subplot(2, 3, 5)
@@ -113,6 +122,8 @@ plot(t_lag, lambda_lag(5, :), ...
 plot(t_gpops, lambda_gpops(5, :), ...
      'LineWidth', 1.5, 'LineStyle', '--');hold on
 legend('Pontryagin', 'GPOPS-II')
+xlabel('t')
+ylabel('\lambda_5')
 title('\lambda_5')
 
 subplot(2, 3, 6)
@@ -121,6 +132,8 @@ plot(t_lag, lambda_lag(6, :), ...
 plot(t_gpops, lambda_gpops(6, :), ...
      'LineWidth', 1.5, 'LineStyle', '--');hold on
 legend('Pontryagin', 'GPOPS-II')
+xlabel('t')
+ylabel('\lambda_6')
 title('\lambda_6')
 
 saveas(f, ['fig/costate_ineq' num_str],'fig');
@@ -134,11 +147,13 @@ plot(t_lag, u3_lag, 'LineWidth', 1.5, 'LineStyle', '-');hold on
 plot(t_gpops, u1_gpops, 'LineWidth', 1.5, 'LineStyle', '--');hold on
 plot(t_gpops, u2_gpops, 'LineWidth', 1.5, 'LineStyle', '--');hold on
 plot(t_gpops, u3_gpops, 'LineWidth', 1.5, 'LineStyle', '--');hold on
-legend('control1 - Pontryagin', 'control2 - Pontryagin', ...
-       'control3 - Pontryagin', ...
-       'control1 - GPOPS-II', 'control2 - GPOPS-II', ...
-       'control3 - GPOPS-II');
-title('Control');
+legend('u_x - Pontryagin', 'u_y - Pontryagin', ...
+       'u_z - Pontryagin', ...
+       'u_x - GPOPS-II', 'u_y - GPOPS-II', ...
+       'u_z - GPOPS-II');
+xlabel('t')
+ylabel('u')
+title('3 Components of Control Vector')
 saveas(f, ['fig/control_ineq' num_str],'fig');
 
 
@@ -147,21 +162,18 @@ f=figure;
 plot(t_lag, u_lag, 'LineWidth', 1.5);hold on
 plot(t_gpops, u_gpops, 'LineWidth', 1.5, 'LineStyle', '--');hold on
 legend('Pontryagin', 'GPOPS-II')
-title('Control - Norm');
+xlabel('t')
+ylabel('$||\mathbf{u}||$', 'Interpreter', 'latex')
+title('Norm of Control Vector')
 saveas(f, ['fig/controlNorm_ineq' num_str],'fig');
 
 
 %--------------------------- Multiplier ----------------------------%
 f=figure;
-plot(t_lag, mu_lag, 'LineWidth', 1.5); hold on
-plot(t_gpops, mu_gpops, 'LineWidth', 1.5, 'LineStyle', '--'); hold on
-axis equal
-title('Multiplier \mu');
-saveas(f, ['fig/mu_ineq' num_str],'fig');
-    
-f=figure;
 plot(t_lag, eta1_lag, 'LineWidth', 1.5);hold on
-title('Multiplier \eta');
+xlabel('t')
+ylabel('\eta')
+title('Multiplier \eta')
 saveas(f, ['fig/eta_ineq' num_str], 'fig');
 
 
@@ -169,32 +181,9 @@ saveas(f, ['fig/eta_ineq' num_str], 'fig');
 f=figure;
 plot(t_lag, H_lag, 'LineWidth', 1.5); hold on
 plot(t_gpops, H_gpops, 'LineWidth', 1.5, 'LineStyle', '--'); hold on
-title('Hamilton');
+legend('Pontryagin', 'GPOPS-II')
+xlabel('t')
+ylabel('$\mathcal{H}$', 'Interpreter', 'latex')
+title('Augmented Hamilton Function')
 saveas(f, ['fig/H_ineq' num_str], 'fig');
 
-%--------------------------- Trajectory ----------------------------%
-f=figure;  
-plot3(x_lag, y_lag, z_lag, 'LineWidth', 1.5);hold on
-plot3(x_gpops, y_gpops, z_gpops, ...
-      'LineWidth', 1.5, 'LineStyle', '--');hold on
-
-plot3(0, 0, 0, 'k*', 'LineWidth', 3);hold on
-text(0, 0, 0, 'Chief');hold on
-    plot3(x_lag(1), y_lag(1), z_lag(1), 'g*', 'LineWidth', 1.5);hold on
-text(x_lag(1), y_lag(1), z_lag(1), 'Departure');hold on
-plot3(x_lag(end), y_lag(end), z_lag(end), 'c*', 'LineWidth', 1.5);hold on
-text(x_lag(end), y_lag(end), z_lag(end), 'Arrival');hold on
-
-rb = rho;
-index = 1:1000:size(u, 2);
-[X, Y, Z] = sphere;
-X2 = X * rb;
-Y2 = Y * rb;
-Z2 = Z * rb;
-surf(X2, Y2, Z2,  'FaceAlpha', 0.2, 'EdgeColor', 'texturemap'); hold on
-colormap(gca, 'gray')
-axis equal
-
-legend('Pontryagin', 'GPOPS-II')
-title('Trajectory');
-saveas(f, ['fig/trajectory_ineq' num_str],'fig');

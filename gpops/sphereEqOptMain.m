@@ -166,11 +166,35 @@ t = solution.phase.time;
 x = solution.phase.state(:, 1);
 y = solution.phase.state(:, 2);
 z = solution.phase.state(:, 3);
+vx = solution.phase.state(:, 4);
+vy = solution.phase.state(:, 5);
+vz = solution.phase.state(:, 6);
 r = sqrt(x.^2 + y.^2 + z.^2);
 u1 = solution.phase.control(:, 1);
 u2 = solution.phase.control(:, 2);
 u3 = solution.phase.control(:, 3);
 u = sqrt(u1.^2 + u2.^2 + u3.^2);
 tSolve = toc;
+costate = solution.phase.costate';
+lambda13 = costate(1:3, :);
+lambda46 = costate(4:6, :);
+state = [x';y';z';vx';vy';vz'];
 
-save data\gpops_eq_data.mat x y z u1 u2 u3 r u tSolve t J
+mu = zeros(length(r), 1);
+H = zeros(length(r), 1);
+for i=1:length(r)
+    tol = 1e-8;
+    if abs(r(i) - 10) > tol
+        mu(i) = 0;
+    else
+        rho = 10;
+        mu(i) = 1 / (2 * rho^2) * (state(1:3, i)' * lambda46(:, i) ...
+                - state(4:6, i)' * state(4:6, i) ...
+                - state(1:3, i)' * auxdata.M1 * state(1:3, i) ...
+                - state(1:3, i)' * auxdata.M2 * state(4:6, i));
+    end
+    H(i) = -1/2 * (lambda46(:, i)' * lambda46(:, i)) + lambda13(:, i)' * state(4:6, i) ...
+           + lambda46(:, i)' * auxdata.M1 * state(1:3, i) + lambda46(:, i)' * auxdata.M2 * state(4:6, i);
+end
+
+save data\gpops_eq_data.mat x y z u1 u2 u3 r u tSolve t J H

@@ -21,7 +21,7 @@ auxdata.M2 = diag([2 * omega, 0], 1) + diag([-2 * omega, 0], -1);
 % Distance - initial, final, bounds
 rho0 = 10;
 rhof = 10;
-rho_lb = 8.8;
+rho_lb = 9.5;
 rho_ub = 10;
 
 % Time - initial, final
@@ -173,7 +173,7 @@ u1 = solution.phase.control(:, 1);
 u2 = solution.phase.control(:, 2);
 u3 = solution.phase.control(:, 3);
 u = sqrt(u1.^2 + u2.^2 + u3.^2);
-tSolve = output.result.nlptime;
+tSolve = toc;
 costate = solution.phase.costate';
 lambda13 = costate(1:3, :);
 lambda46 = costate(4:6, :);
@@ -196,4 +196,4 @@ for i=1:length(r)
            + lambda46(:, i)' * auxdata.M1 * state(1:3, i) + lambda46(:, i)' * auxdata.M2 * state(4:6, i);
 end
 
-save data\gpops_ineq_data.mat x y z u1 u2 u3 r u tSolve t J costate vx vy vz mu H
+save data\gpops_ineq_data_9_5.mat x y z u1 u2 u3 r u tSolve t J costate vx vy vz mu H

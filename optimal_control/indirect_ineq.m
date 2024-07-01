@@ -6,12 +6,12 @@
 % constrained relative motion trajectories in low earth orbit[J].   %
 % Journal of Guidance, Control, and Dynamics, 2023, 46(4): 666-679. %  
 %-------------------------------------------------------------------%
-clc;clear
+clc;clear;tic
 
 %-------------------------------------------------------------------%
 %---------------------------- Constant -----------------------------%
 %-------------------------------------------------------------------%
-rho = 8.8; 
+rho = 9.5; 
 rho0 = 10; omega = 4;
 theta0 = pi; thetaf = theta0 + pi/2;
 M1 = diag([3 * omega^2, 0, -omega^2]);
@@ -140,7 +140,6 @@ state1_guess = [r1guess; v1guess];
 state2_guess = [r2guess; v2guess];
 
 %------------------------ Multiple Shooting ------------------------%
-tic
 options = odeset('RelTol', 1e-12, 'AbsTol', 1e-10, ...
                  'NormControl','on');
 
@@ -236,7 +235,7 @@ dJ = 0.5*u.^2;
 J = trapz(t, dJ);
 
 
-save data/indirect_ineq_data.mat rho0 rho x y z ...
+save data/indirect_ineq_data_9_5.mat rho0 rho x y z ...
                                  u1 u2 u3 r u tSolve ...
                                  lambda t J mu eta1 eta2 H
 
